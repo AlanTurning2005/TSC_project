@@ -17,3 +17,8 @@ sumo_scenarios/**/tripinfo.xml
 sumo_scenarios/**/summary.xml
 sumo_scenarios/**/queue.xml
 *.log
+
+# Bỏ qua file chứa key thật
+.env
+*.env
+macro_traffic_crawler/.env
