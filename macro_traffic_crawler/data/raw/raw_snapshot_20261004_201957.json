@@ -1,0 +1,15 @@
+[
+  {
+    "point_id": "way_32585854",
+    "road_name": "Nguyễn Văn Cừ",
+    "lat": 10.762222,
+    "lon": 106.682848,
+    "timestamp": "2026-10-04T20:19:57.130971",
+    "data": {
+      "flowSegmentData": {
+        "currentSpeed": 20.7,
+        "mock": true
+      }
+    }
+  }
+]

@@ -1,0 +1,173 @@
+================================================================================
+TÀI LIỆU KỸ THUẬT: PIPELINE CRAWL & LƯU TRỮ MACRO TRAFFIC DATA (TOMTOM)
+Thư mục: macro_traffic_crawler (thuộc dự án TSC_project)
+Mục tiêu: Thu thập dữ liệu giao thông vĩ mô làm tiền đề cho Micro Simulation
+================================================================================
+
+TỔNG QUAN PIPELINE:
+Pipeline gồm 4 bước chính khép kín:
+  Bước 1: Cấu hình môi trường & Tham số vận hành (config.py, .env)
+  Bước 2: Trích xuất điểm đo vĩ mô từ OpenStreetMap (extract_osm_points.py)
+  Bước 3: Kết nối TomTom Flow API & Thu thập dữ liệu (tomtom_client.py)
+  Bước 4: Xử lý, Tính toán Feature Macro & Lưu trữ 2 tầng (run_crawler.py)
+
+--------------------------------------------------------------------------------
+BƯỚC 1: CẤU HÌNH MÔI TRƯỜNG VÀ THAM SỐ VẬN HÀNH
+--------------------------------------------------------------------------------
+- Bước thứ mấy: Bước 1
+- Tóm tắt nội dung:
+  Nạp các thông số cấu hình hệ thống, khóa xác thực TomTom API Key, các ngưỡng 
+  giới hạn tốc độ request và định tuyến đường dẫn thư mục lưu trữ dữ liệu.
+
+- Mục đích:
+  Đảm bảo module có thể chạy độc lập hoặc tích hợp liền mạch vào TSC_project; 
+  quản lý tập trung API Key an toàn mà không bị lộ trong mã nguồn; kiểm soát tốc độ 
+  gọi để không bị TomTom khóa tài khoản do vượt rate limit.
+
+- Input / Output:
+  + Input: File cấu hình `.env` (hoặc biến môi trường hệ thống).
+  + Output: Các hằng số cấu hình được nạp vào module (TOMTOM_API_KEY, TOMTOM_FLOW_URL, 
+    REQUEST_DELAY_SECONDS, CRAWL_INTERVAL_SECONDS, các Path đường dẫn).
+
+- Thực hiện ra sao / Logic code & Điều kiện đặc biệt:
+  + Logic linh hoạt: Script sử dụng thư viện python-dotenv để nạp `.env` từ 2 vị trí: 
+    ngay trong thư mục `macro_traffic_crawler/.env` hoặc tại thư mục gốc dự án 
+    `TSC_project/.env`. Người dùng đặt file ở đâu hệ thống cũng tự nhận diện được.
+  + Tự động bật chế độ MOCK TEST: Nếu phát hiện TOMTOM_API_KEY bị để trống hoặc 
+    còn để giá trị mặc định "YOUR_TOMTOM_API_KEY", hệ thống không báo lỗi dừng 
+    chương trình mà tự động chuyển sang chế độ giả lập offline (Mock Mode) giúp 
+    kiểm thử toàn bộ luồng chạy mà không tiêu tốn quota.
+  + Thiết lập độ trễ an toàn: Đặt sẵn REQUEST_DELAY_SECONDS = 0.2s (tương đương 
+    tối đa 5 requests/giây) nhằm tuân thủ tuyệt đối quy định không vượt quá 5 QPS 
+    của gói TomTom miễn phí.
+
+
+--------------------------------------------------------------------------------
+BƯỚC 2: TRÍCH XUẤT ĐIỂM ĐO VĨ MÔ TỪ MẠNG LƯỚI OPENSTREETMAP
+--------------------------------------------------------------------------------
+- Bước thứ mấy: Bước 2
+- Tóm tắt nội dung:
+  Đọc file bản đồ giao thông gốc của dự án (data/raw_data/map.osm), phân tích 
+  cấu trúc không gian và tự động chọn ra danh sách các tọa độ đại diện trên các 
+  tuyến đường huyết mạch của khu vực TP.HCM.
+
+- Mục đích:
+  Biến bản đồ OSM tĩnh thành danh sách các điểm đo cụ thể (Sampling Points) 
+  để gửi request lên TomTom. Tránh việc phải nhập tay tọa độ và đảm bảo các điểm 
+  lấy về khớp 100% với mạng lưới đường của SUMO (my_network.net.xml).
+
+- Input / Output:
+  + Input: File `data/raw_data/map.osm` (chứa hơn 42,000 dòng XML, 7,800+ nodes).
+  + Output: File `data/sampling_points.csv` gồm 5 cột:
+    [point_id, road_name, highway_type, lat, lon].
+
+- Thực hiện ra sao / Logic code & Điều kiện đặc biệt:
+  + Bộ lọc cấp đường nghiêm ngặt (Road Hierarchy Filtering):
+    Chỉ giữ lại các thẻ `<way>` có tag "highway" thuộc tập ưu tiên:
+    {'trunk', 'primary', 'secondary', 'tertiary', 'trunk_link', 'primary_link', 
+     'secondary_link', 'tertiary_link'}.
+    --> ĐIỀU KIỆN ĐẶC BIỆT: Loại bỏ hoàn toàn các hẻm nhỏ, ngõ cụt, đường đi bộ 
+    (residential, service, footway, cycleway) để tập trung tối đa quota request 
+    vào các trục đường quyết định dòng xe đô thị (Nguyễn Văn Cừ, Trần Hưng Đạo, 
+    Võ Văn Kiệt, Cầu Nguyễn Văn Cừ...).
+  + Tối ưu bộ nhớ RAM với Stream XML (ET.iterparse):
+    Không nạp toàn bộ file lớn vào RAM (DOM tree), mà dùng `iterparse` bắt sự kiện 
+    end-tag. Sau khi đọc xong tọa độ của `<node>`, lập tức gọi `elem.clear()` để 
+    giải phóng bộ nhớ ngay tức thì.
+  + Logic tọa độ Trung điểm (Midpoint Extraction):
+    Không lấy node đầu hay node cuối của đoạn đường vì đó là tim nút giao (ngã 3, 
+    ngã 4) - nơi TomTom rất dễ nhận diện nhầm sang đường cắt ngang. Code lấy đúng 
+    node ở chính giữa đoạn đường (`mid_idx = len(nodes) // 2`) để đảm bảo TomTom 
+    bắt đúng 100% vào thân tuyến đường đó.
+  + Khử trùng lặp không gian (Spatial Deduplication):
+    Cùng một con đường dài thường bị chia thành nhiều đoạn nhỏ trong OSM. Code làm 
+    tròn tọa độ đến 4 chữ số thập phân (~11 mét). Nếu hai đoạn đường có trung điểm 
+    quá sát nhau, code chỉ giữ lại 1 điểm duy nhất nhằm rải đều mật độ đo trên toàn 
+    mạng lưới.
+  + Cơ chế Fallback tự động: Nếu không tìm thấy file map.osm, code tự động sinh 
+    lưới ma trận 5x5 điểm đều nhau phủ trên Bounding Box của khu vực nghiên cứu.
+
+
+--------------------------------------------------------------------------------
+BƯỚC 3: KẾT NỐI TOMTOM FLOW API & THU THẬP DỮ LIỆU
+--------------------------------------------------------------------------------
+- Bước thứ mấy: Bước 3
+- Tóm tắt nội dung:
+  Gửi yêu cầu HTTP GET đến TomTom Traffic Flow API (Flow Segment Data) cho từng 
+  điểm tọa độ lấy từ Bước 2, đồng thời xử lý lỗi mạng và giới hạn tần suất gọi.
+
+- Mục đích:
+  Lấy về trạng thái vận hành thực tế theo thời gian thực của đoạn đường (vận tốc 
+  hiện tại, vận tốc tự do, thời gian di chuyển, độ tin cậy).
+
+- Input / Output:
+  + Input: Tọa độ (lat, lon) của từng điểm đo.
+  + Output: Dictionary chứa dữ liệu đã bóc tách + Payload JSON gốc từ TomTom:
+    [frc, current_speed, free_flow_speed, current_travel_time, free_flow_travel_time, 
+     delay_seconds, congestion_index, confidence, road_closure, coordinates].
+
+- Thực hiện ra sao / Logic code & Điều kiện đặc biệt:
+  + Cơ chế Retry & Exponential Backoff:
+    Khi gặp lỗi 429 (Too Many Requests), client sẽ không dừng chương trình mà tự động 
+    tạm dừng với thời gian tăng dần (2s, 4s, 6s) và thử lại tối đa 3 lần trước 
+    khi chuyển sang điểm tiếp theo.
+  + Timeout & Bảo vệ kết nối mạng:
+    Mỗi request có thời gian chờ (timeout) 10 giây, tránh tình trạng treo tiến trình 
+    vô hạn nếu đường truyền mạng gặp sự cố.
+  + Tính toán chỉ số ùn tắc tức thời (Congestion Index):
+    Hệ thống tự động tính:
+      congestion_index = (free_flow_speed - current_speed) / free_flow_speed
+    Giá trị được chuẩn hóa từ [0.0 - 1.0] phản ánh trực quan mức độ nghẽn đường.
+  + Bộ sinh dữ liệu Mock Engine:
+    Khi ở chế độ chạy thử, hệ thống tự động sinh ngẫu nhiên vận tốc và độ trễ theo 
+    đúng quy luật vật lý giao thông (current_speed <= free_flow_speed, thời gian trễ > 0) 
+    giúp kiểm thử hệ thống bất cứ lúc nào mà không cần kết nối mạng hay tốn API Key.
+
+
+--------------------------------------------------------------------------------
+BƯỚC 4: XỬ LÝ, TÍNH TOÁN FEATURE MACRO & LƯU TRỮ 2 TẦNG
+--------------------------------------------------------------------------------
+- Bước thứ mấy: Bước 4
+- Tóm tắt nội dung:
+  Điều phối toàn bộ tiến trình (Snapshot 1 lần hoặc Vòng lặp định kỳ Loop), thực hiện 
+  chuyển đổi toán học từ Macro Feature sang Micro Demand (Hàm BPR), và lưu trữ 
+  đồng thời ở cả 2 tầng: Raw (JSON) và Processed (CSV).
+
+- Mục đích:
+  Lưu giữ toàn vẹn dữ liệu gốc để đối soát và tái tạo hình học; tạo ra bảng đặc trưng 
+  tính toán sẵn lưu lượng xe (xe/giờ) và tần suất xe vào mạng lưới (xe/giây) 
+  để có thể nạp thẳng vào file cấu hình xe của SUMO/CityFlow ở giai đoạn sau.
+
+- Input / Output:
+  + Input: Danh sách từ `sampling_points.csv` và các tham số dòng lệnh 
+    (--mode, --limit, --interval, --mock).
+  + Output:
+    1. Tầng Raw: `data/raw/raw_snapshot_YYYYMMDD_HHMMSS.json` (Lưu toàn bộ phản hồi gốc).
+    2. Tầng Processed: `data/processed/macro_traffic_history.csv` (Bảng dữ liệu 
+       chuỗi thời gian time-series với đầy đủ features).
+
+- Thực hiện ra sao / Logic code & Điều kiện đặc biệt:
+  + Tính toán sẵn cầu nối Macro -> Micro bằng Hàm BPR (Bureau of Public Roads):
+    TomTom không cung cấp trực tiếp số lượng xe, chỉ trả về vận tốc và thời gian đi. 
+    Code áp dụng dạng nghịch đảo của hàm BPR kinh điển trong kỹ thuật giao thông:
+      T = T_0 * (1 + alpha * (V / C)^beta)
+      ==> V = C * [ ( (T / T_0) - 1 ) / alpha ] ^ (1 / beta)
+    Với:
+      - T: Thời gian di chuyển thực tế (current_travel_time)
+      - T_0: Thời gian di chuyển tự do (free_flow_travel_time)
+      - C: Năng lực thông hành tiêu chuẩn của làn đường (mặc định 1200 xe/làn/giờ)
+      - alpha = 0.15, beta = 4.0 (tham số chuẩn của Cục Đường bộ Hoa Kỳ)
+    Từ lưu lượng V (est_volume_vph), code tính ra tiếp:
+      arrival_rate_vps = V / 3600 (xe/giây)
+    --> ĐÂY CHÍNH LÀ THAM SỐ CỐT LÕI để sinh luồng xe theo phân phối Poisson cho bước vi mô!
+  + Kiến trúc lưu trữ 2 tầng (Two-Tier Storage Architecture):
+    - Tầng Raw: Mỗi vòng quét lưu thành 1 file JSON riêng biệt có đóng dấu thời gian. 
+      Đảm bảo không bao giờ bị mất tọa độ đường đa tuyến (polyline coordinates) chi tiết.
+    - Tầng Processed: Ghi nối tiếp (Append mode) vào duy nhất một file CSV lịch sử. 
+      Tự động kiểm tra file rỗng để chống lỗi parser, hỗ trợ phân tích dữ liệu lớn.
+  + Hai chế độ chạy linh hoạt:
+    - Chạy 1 lần (`--mode once`): Thích hợp test nhanh 1-10 điểm.
+    - Chạy chu kỳ (`--mode loop --interval 900`): Script tự động lặp theo chu kỳ hẹn giờ, 
+      bắt tín hiệu ngắt `KeyboardInterrupt (Ctrl+C)` an toàn, đảm bảo dữ liệu đang ghi 
+      không bị hỏng file khi người dùng dừng giữa chừng.
+================================================================================

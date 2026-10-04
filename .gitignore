@@ -1,0 +1,19 @@
+# Byte-compiled / cache của Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Môi trường ảo (Virtual environments)
+venv/
+env/
+.venv/
+
+# Cấu hình IDE / Editor
+.vscode/
+.idea/
+
+# Các file log/kết quả đầu ra của SUMO phát sinh khi chạy
+sumo_scenarios/**/tripinfo.xml
+sumo_scenarios/**/summary.xml
+sumo_scenarios/**/queue.xml
+*.log

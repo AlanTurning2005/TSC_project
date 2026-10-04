@@ -1,0 +1,14 @@
+<configuration>
+    <input>
+        <net-file value="my_network.net.xml"/>
+        <route-files value="my_flow.rou.xml"/>
+    </input>
+    <time>
+        <begin value="0"/>
+        <end value="3600"/>
+    </time>
+    <processing>
+        <time-to-teleport value="300"/>
+        <collision.action value="none"/>
+    </processing>
+</configuration>

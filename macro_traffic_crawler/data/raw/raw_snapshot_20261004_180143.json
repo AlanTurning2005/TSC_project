@@ -1,0 +1,67 @@
+[
+  {
+    "point_id": "way_32585854",
+    "road_name": "Nguyễn Văn Cừ",
+    "lat": 10.762222,
+    "lon": 106.682848,
+    "timestamp": "2026-10-04T18:01:43.980541",
+    "data": {
+      "flowSegmentData": {
+        "currentSpeed": 17.5,
+        "mock": true
+      }
+    }
+  },
+  {
+    "point_id": "way_32586673",
+    "road_name": "Nguyễn Biểu",
+    "lat": 10.757298,
+    "lon": 106.683203,
+    "timestamp": "2026-10-04T18:01:43.980541",
+    "data": {
+      "flowSegmentData": {
+        "currentSpeed": 43.3,
+        "mock": true
+      }
+    }
+  },
+  {
+    "point_id": "way_33573873",
+    "road_name": "Cầu Nguyễn Văn Cừ",
+    "lat": 10.753862,
+    "lon": 106.686856,
+    "timestamp": "2026-10-04T18:01:43.980541",
+    "data": {
+      "flowSegmentData": {
+        "currentSpeed": 29.3,
+        "mock": true
+      }
+    }
+  },
+  {
+    "point_id": "way_35113724",
+    "road_name": "Đường Nguyễn Cảnh Chân",
+    "lat": 10.757939,
+    "lon": 106.68888,
+    "timestamp": "2026-10-04T18:01:43.980541",
+    "data": {
+      "flowSegmentData": {
+        "currentSpeed": 25.7,
+        "mock": true
+      }
+    }
+  },
+  {
+    "point_id": "way_165216642",
+    "road_name": "Nguyễn Văn Cừ",
+    "lat": 10.75476,
+    "lon": 106.686451,
+    "timestamp": "2026-10-04T18:01:43.980541",
+    "data": {
+      "flowSegmentData": {
+        "currentSpeed": 29.2,
+        "mock": true
+      }
+    }
+  }
+]
