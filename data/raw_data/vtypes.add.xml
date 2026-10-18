@@ -1,0 +1,67 @@
+<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
+    <!-- ============================================================================== -->
+    <!-- ĐỊNH NGHĨA PHƯƠNG TIỆN GIAO THÔNG HỖN HỢP TP. HỒ CHÍ MINH (TCVN 104:2007)      -->
+    <!-- Hỗ trợ Sublane Model để mô phỏng chính xác xe máy luồn lách tự do              -->
+    <!-- ============================================================================== -->
+
+    <vTypeDistribution id="hcmc_mixed">
+        <!-- 1. Xe máy (85% dòng xe): luồn lách tự do, khoảng cách ngang nhỏ (0.2m) -->
+        <vType id="motorcycle"
+               vClass="motorcycle"
+               guiShape="motorcycle"
+               probability="0.85"
+               length="1.8"
+               width="0.8"
+               height="1.2"
+               maxSpeed="13.89"
+               accel="2.5"
+               decel="4.5"
+               emergencyDecel="6.0"
+               sigma="0.5"
+               minGap="0.5"
+               latAlignment="arbitrary"
+               minGapLat="0.2"
+               lcSublane="1.0"
+               lcPushy="0.8"
+               lcAssertive="1.2"
+               color="0,200,255"/>
+
+        <!-- 2. Xe con / Taxi (12% dòng xe): đi giữa làn, khoảng cách ngang chuẩn -->
+        <vType id="passenger"
+               vClass="passenger"
+               guiShape="passenger"
+               probability="0.12"
+               length="4.5"
+               width="1.8"
+               height="1.5"
+               maxSpeed="13.89"
+               accel="2.0"
+               decel="4.0"
+               emergencyDecel="6.0"
+               sigma="0.4"
+               minGap="1.5"
+               latAlignment="center"
+               minGapLat="0.6"
+               lcSublane="0.5"
+               lcPushy="0.2"
+               color="255,255,0"/>
+
+        <!-- 3. Xe buýt đô thị (3% dòng xe): cồng kềnh, chiếm nhiều không gian -->
+        <vType id="bus"
+               vClass="bus"
+               guiShape="bus"
+               probability="0.03"
+               length="10.5"
+               width="2.5"
+               height="3.2"
+               maxSpeed="11.11"
+               accel="1.2"
+               decel="3.0"
+               emergencyDecel="5.0"
+               sigma="0.3"
+               minGap="2.5"
+               latAlignment="center"
+               minGapLat="0.8"
+               color="0,255,100"/>
+    </vTypeDistribution>
+</additional>

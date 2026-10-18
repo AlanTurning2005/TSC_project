@@ -1,41 +1,67 @@
-﻿point_id,road_name,highway_type,lat,lon
-way_32585854,Nguyễn Văn Cừ,primary,10.762222,106.682848
-way_32586673,Nguyễn Biểu,secondary,10.757298,106.683203
-way_33573873,Cầu Nguyễn Văn Cừ,primary,10.753862,106.686856
-way_35113724,Đường Nguyễn Cảnh Chân,tertiary,10.757939,106.68888
-way_165216642,Nguyễn Văn Cừ,primary_link,10.75476,106.686451
-way_165216643,Nguyễn Văn Cừ,primary_link,10.754653,106.686312
-way_189017049,Võ Văn Kiệt,primary,10.755886,106.688742
-way_219859641,Cầu Nguyễn Văn Cừ,primary,10.754038,106.686709
-way_219859643,Nguyễn Văn Cừ,primary,10.755803,106.685594
-way_219859645,Nguyễn Văn Cừ,primary,10.75585,106.685444
-way_219860447,Nguyễn Văn Cừ,primary,10.758735,106.684343
-way_227746179,Trần Hưng Đạo,primary,10.756417,106.685286
-way_327048057,Trần Hưng Đạo,primary,10.755154,106.680361
-way_327048058,Nguyễn Văn Cừ,primary,10.756372,106.68518
-way_330374257,Lê Hồng Phong,secondary,10.761535,106.676766
-way_330374295,Trần Phú,primary,10.762691,106.679125
-way_330532332,Nguyễn Văn Cừ,primary,10.760069,106.683711
-way_330532335,Nguyễn Văn Cừ,primary,10.762277,106.682987
-way_432079671,Nguyễn Trãi,secondary,10.757578,106.67911
-way_464307720,Unnamed Road,primary_link,10.757425,106.68625
-way_466043072,Võ Văn Kiệt,primary,10.754694,106.688027
-way_466095118,Trần Hưng Đạo,primary,10.758549,106.687012
-way_466095490,Trần Hưng Đạo,primary,10.758449,106.687149
-way_467714905,Trần Bình Trọng,tertiary,10.760872,106.679749
-way_467714908,Trần Bình Trọng,tertiary,10.756492,106.681079
-way_468616398,Trần Hưng Đạo,primary,10.754773,106.679287
-way_468616402,Lê Hồng Phong,tertiary,10.756155,106.678478
-way_468616410,Huỳnh Mẫn Đạt,tertiary,10.754742,106.676726
-way_468695188,Trần Hưng Đạo,primary,10.756283,106.684844
-way_468695191,Trần Bình Trọng,tertiary,10.755383,106.681381
-way_468695192,Trần Bình Trọng,tertiary,10.754111,106.681955
-way_567510252,Cầu Nguyễn Văn Cừ,primary_link,10.754166,106.687417
-way_585932605,Lê Hồng Phong,secondary,10.758254,106.677809
-way_610375512,Nguyễn Văn Cừ,primary,10.763452,106.682276
-way_610375515,Nguyễn Văn Cừ,primary,10.76355,106.682571
-way_612147499,Nguyễn Văn Cừ,primary,10.760795,106.683363
-way_613707993,Unnamed Road,primary_link,10.75841,106.68689
-way_689466825,Nguyễn Biểu,secondary,10.754708,106.684125
-way_696114973,Nguyễn Văn Cừ,primary,10.756546,106.685221
-way_696114975,Trần Hưng Đạo,primary,10.756484,106.685126
+﻿point_id,road_name,highway_type,lanes,lat,lon
+way_35112971,Lê Quý Đôn,tertiary,1,10.77906,106.693293
+way_35113721,Ngô Thời Nhiệm,tertiary,1,10.780997,106.690338
+way_35114207,Võ Văn Tần,secondary,3,10.779394,106.69293
+way_35114262,Công trường Công xã Paris,tertiary,3,10.779333,106.699134
+way_35114553,Trần Quốc Thảo,secondary,1,10.781773,106.687881
+way_192035998,Hồ Xuân Hương,tertiary,1,10.775946,106.686987
+way_193256696,Nguyễn Thị Minh Khai,primary,4,10.776516,106.69215
+way_193616433,Nam Kỳ Khởi Nghĩa,secondary,3,10.782233,106.692114
+way_205311563,Tú Xương,tertiary,1,10.782601,106.688284
+way_326771005,Nguyễn Đình Chiểu,secondary,3,10.777926,106.689568
+way_326771006,Nam Kỳ Khởi Nghĩa,secondary,3,10.778659,106.695988
+way_326849844,Nguyễn Thị Minh Khai,primary,3,10.775406,106.691135
+way_326849845,Nguyễn Thị Minh Khai,primary,3,10.7817,106.696972
+way_326849846,Pasteur,secondary,2,10.782403,106.693829
+way_327048052,Nguyễn Đình Chiểu,secondary,3,10.775145,106.686947
+way_327048054,Bà Huyện Thanh Quan,tertiary,2,10.778537,106.686553
+way_329878183,Nam Kỳ Khởi Nghĩa,secondary,3,10.776311,106.698517
+way_329878185,Nguyễn Du,tertiary,2,10.774911,106.696269
+way_408246393,Điện Biên Phủ,primary,3,10.779989,106.687135
+way_408845370,Nguyễn Thị Minh Khai,primary,2,10.782462,106.69771
+way_608262688,Nam Ky Khoi Nghia,secondary,3,10.780577,106.693913
+way_654858165,Võ Thị Sáu,primary,3,10.782183,106.686306
+way_654858471,Trương Định,tertiary,3,10.777989,106.689499
+way_654858472,Tú Xương,tertiary,1,10.779542,106.685158
+way_654861070,Tú Xương,tertiary,1,10.780763,106.686405
+way_658328100,Lê Quý Đôn,tertiary,1,10.781434,106.690713
+way_678315474,Pasteur,secondary,3,10.77895,106.697578
+way_678315476,Pasteur,secondary,2,10.780215,106.696206
+way_686500792,Pasteur,secondary,1,10.779529,106.696942
+way_694942823,Trần Quốc Thảo,tertiary,1,10.778237,106.69171
+way_694973742,Trần Quốc Thảo,tertiary,1,10.780204,106.689575
+way_700026885,Nguyễn Thông,tertiary,2,10.776727,106.686219
+way_716065020,Lý Tự Trọng,tertiary,3,10.775343,106.698609
+way_732571882,Nguyễn Du,tertiary,2,10.777482,106.698604
+way_747226799,Lê Duẩn,secondary,3,10.780922,106.699133
+way_747226800,Nguyễn Thị Minh Khai,primary,3,10.780064,106.695441
+way_747231131,Pasteur,secondary,3,10.778238,106.69836
+way_749986988,Nam Kỳ Khởi Nghĩa,secondary,3,10.777671,106.697058
+way_758852506,Lê Duẩn,secondary,3,10.778993,106.697241
+way_803279638,Lê Duẩn,secondary,3,10.77931,106.697538
+way_803279639,Phạm Ngọc Thạch,tertiary,1,10.781199,106.69752
+way_803279640,Unnamed Road,secondary,2,10.78022,106.69854
+way_1157160322,Phạm Ngọc Thạch,tertiary,1,10.780455,106.698334
+way_1162414403,Trương Định,tertiary,2,10.774879,106.693001
+way_1162554504,Phạm Ngọc Thạch,tertiary,1,10.782295,106.696321
+way_1176155754,Bà Huyện Thanh Quan,secondary,2,10.774916,106.690475
+way_1177448206,Phạm Ngọc Thạch,tertiary,1,10.780929,106.697816
+way_1179966753,Ngô Thời Nhiệm,tertiary,1,10.777458,106.686806
+way_1182181717,Lê Duẩn,secondary,2,10.780791,106.698894
+way_1184372243,Nguyễn Đình Chiểu,secondary,3,10.781411,106.692883
+way_1184372244,Lê Quý Đôn,tertiary,1,10.779492,106.692823
+way_1185423294,Hồ Xuân Hương,tertiary,1,10.775288,106.686392
+way_1222962346,Võ Văn Tần,secondary,2,10.774624,106.688524
+way_1222962347,Trương Định,tertiary,3,10.780952,106.685898
+way_1265822554,Unnamed Road,secondary,2,10.780302,106.698441
+way_1265822570,Unnamed Road,secondary,2,10.780356,106.698497
+way_1267006215,Nguyễn Thị Minh Khai,primary,3,10.779496,106.694918
+way_1267138238,Nguyễn Đình Chiểu,secondary,3,10.779802,106.691355
+way_1267653586,Nguyễn Đình Chiểu,secondary,2,10.782481,106.6939
+way_1313420763,Nguyễn Thị Minh Khai,primary,3,10.77807,106.693597
+way_1374006570,Công trường Công xã Paris,tertiary,2,10.780361,106.6987
+way_1391882257,Công trường Công xã Paris,tertiary,2,10.780119,106.698402
+way_1391882258,Công trường Công xã Paris,tertiary,2,10.779944,106.698468
+way_1395935222,Lê Duẩn,tertiary,2,10.780034,106.698266
+way_1395935224,Công trường Công xã Paris,tertiary,2,10.780022,106.698365
+way_1414094279,Unnamed Road,secondary,2,10.780339,106.698561

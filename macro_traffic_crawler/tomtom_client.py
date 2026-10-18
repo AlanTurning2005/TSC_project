@@ -10,6 +10,10 @@ import requests
 from typing import Dict, Any, Optional
 from config import TOMTOM_API_KEY, TOMTOM_FLOW_URL, REQUEST_DELAY_SECONDS
 
+class QuotaExceededError(Exception):
+    """Ngoại lệ khi API Key hết quota hoặc bị chặn 403."""
+    pass
+
 class TomTomTrafficClient:
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or TOMTOM_API_KEY
@@ -17,18 +21,20 @@ class TomTomTrafficClient:
         if self.is_mock:
             print("[WARN] TOMTOM_API_KEY chua duoc cau hinh trong .env. Client se hoat dong o che do MOCK TEST.")
 
-    def get_flow_segment(self, lat: float, lon: float, max_retries: int = 3) -> Optional[Dict[str, Any]]:
+    def get_flow_segment(self, lat: float, lon: float, api_key: Optional[str] = None, max_retries: int = 3) -> Optional[Dict[str, Any]]:
         """
         Goi Flow Segment Data API cho toa do (lat, lon).
         Tra ve dict chua cac macro traffic features va raw payload.
+        Neu api_key duoc truyen vao, se uu tien su dung thay vi self.api_key.
         """
-        if self.is_mock:
+        active_key = api_key or self.api_key
+        if self.is_mock or active_key.startswith("MOCK_KEY"):
             return self._mock_flow_data(lat, lon)
 
         params = {
             "point": f"{lat},{lon}",
             "unit": "KMPH",
-            "key": self.api_key,
+            "key": active_key,
             "thickness": 10
         }
 
@@ -42,6 +48,10 @@ class TomTomTrafficClient:
                     flow = raw_data.get("flowSegmentData", {})
                     return self._parse_flow_data(lat, lon, flow, raw_data)
 
+                elif response.status_code == 403:
+                    # Hết quota hoặc key không hợp lệ
+                    raise QuotaExceededError(f"HTTP 403: {response.text[:100]}")
+
                 elif response.status_code == 429:
                     wait_time = attempt * 2
                     print(f"[!] Rate limit (429). Cho {wait_time}s truoc khi thu lai lan {attempt}/{max_retries}...")
@@ -50,6 +60,8 @@ class TomTomTrafficClient:
                     print(f"[!] Loi API ({response.status_code}): {response.text[:100]}")
                     return None
 
+            except QuotaExceededError:
+                raise
             except Exception as e:
                 print(f"[!] Ngoai le khi goi TomTom API ({attempt}/{max_retries}): {e}")
                 time.sleep(1)

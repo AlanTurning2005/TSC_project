@@ -171,3 +171,20 @@ BƯỚC 4: XỬ LÝ, TÍNH TOÁN FEATURE MACRO & LƯU TRỮ 2 TẦNG
       bắt tín hiệu ngắt `KeyboardInterrupt (Ctrl+C)` an toàn, đảm bảo dữ liệu đang ghi 
       không bị hỏng file khi người dùng dừng giữa chừng.
 ================================================================================
+
+
+**Tọa độ bản đồ 
+upper :10.782068
+left: 106.686022
+right: 106.698661
+bottom: 10.775291
+
+tk, mk, API_key
+dinhvocongdanh10.1@gmail.com,
+Congdanh@123,
+69iqTfzLLKybgfDXB22ZjfK5weQA9NOY,
+
+
+
+use: 
+python macro_traffic_crawler\scheduled_crawler.py --all-day --interval 600

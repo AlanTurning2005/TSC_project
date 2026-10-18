@@ -1,0 +1,334 @@
+{
+  "description": "Đồ thị giao tiếp có hướng giữa các ngã tư cho MARL dựa trên Time-Lagged Cross-Correlation",
+  "generated_at": "2026-10-15T14:18:16.624819",
+  "causal_edges": [
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_747226799",
+      "target_name": "Lê Duẩn",
+      "lag_minutes": 25,
+      "peak_correlation": 0.95
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_1374006570",
+      "target_name": "Công trường Công xã Paris",
+      "lag_minutes": 10,
+      "peak_correlation": 0.95
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_1414094279",
+      "target_name": "Unnamed Road",
+      "lag_minutes": 10,
+      "peak_correlation": 0.95
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_1414094279",
+      "target_name": "Unnamed Road",
+      "lag_minutes": 25,
+      "peak_correlation": 0.949
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_1265822570",
+      "target_name": "Unnamed Road",
+      "lag_minutes": 10,
+      "peak_correlation": 0.949
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_747226799",
+      "target_name": "Lê Duẩn",
+      "lag_minutes": 20,
+      "peak_correlation": 0.948
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_1265822570",
+      "target_name": "Unnamed Road",
+      "lag_minutes": 25,
+      "peak_correlation": 0.948
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_1374006570",
+      "target_name": "Công trường Công xã Paris",
+      "lag_minutes": 10,
+      "peak_correlation": 0.948
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_1182181717",
+      "target_name": "Lê Duẩn",
+      "lag_minutes": 25,
+      "peak_correlation": 0.948
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_1182181717",
+      "target_name": "Lê Duẩn",
+      "lag_minutes": 20,
+      "peak_correlation": 0.946
+    },
+    {
+      "source_id": "way_1414094279",
+      "source_name": "Unnamed Road",
+      "target_id": "way_35114262",
+      "target_name": "Công trường Công xã Paris",
+      "lag_minutes": 5,
+      "peak_correlation": 0.917
+    },
+    {
+      "source_id": "way_747226799",
+      "source_name": "Lê Duẩn",
+      "target_id": "way_35114262",
+      "target_name": "Công trường Công xã Paris",
+      "lag_minutes": 5,
+      "peak_correlation": 0.916
+    },
+    {
+      "source_id": "way_1182181717",
+      "source_name": "Lê Duẩn",
+      "target_id": "way_35114262",
+      "target_name": "Công trường Công xã Paris",
+      "lag_minutes": 5,
+      "peak_correlation": 0.916
+    },
+    {
+      "source_id": "way_1265822570",
+      "source_name": "Unnamed Road",
+      "target_id": "way_35114262",
+      "target_name": "Công trường Công xã Paris",
+      "lag_minutes": 5,
+      "peak_correlation": 0.915
+    },
+    {
+      "source_id": "way_1374006570",
+      "source_name": "Công trường Công xã Paris",
+      "target_id": "way_35114262",
+      "target_name": "Công trường Công xã Paris",
+      "lag_minutes": 5,
+      "peak_correlation": 0.915
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_803279640",
+      "target_name": "Unnamed Road",
+      "lag_minutes": 20,
+      "peak_correlation": 0.902
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_803279640",
+      "target_name": "Unnamed Road",
+      "lag_minutes": 20,
+      "peak_correlation": 0.901
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_732571882",
+      "target_name": "Nguyễn Du",
+      "lag_minutes": 20,
+      "peak_correlation": 0.901
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_732571882",
+      "target_name": "Nguyễn Du",
+      "lag_minutes": 15,
+      "peak_correlation": 0.9
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_1157160322",
+      "target_name": "Phạm Ngọc Thạch",
+      "lag_minutes": 20,
+      "peak_correlation": 0.9
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_803279638",
+      "target_name": "Lê Duẩn",
+      "lag_minutes": 20,
+      "peak_correlation": 0.9
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_747231131",
+      "target_name": "Pasteur",
+      "lag_minutes": 20,
+      "peak_correlation": 0.9
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_1157160322",
+      "target_name": "Phạm Ngọc Thạch",
+      "lag_minutes": 20,
+      "peak_correlation": 0.899
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_35114262",
+      "target_name": "Công trường Công xã Paris",
+      "lag_minutes": 20,
+      "peak_correlation": 0.899
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_758852506",
+      "target_name": "Lê Duẩn",
+      "lag_minutes": 20,
+      "peak_correlation": 0.899
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_1391882258",
+      "target_name": "Công trường Công xã Paris",
+      "lag_minutes": 20,
+      "peak_correlation": 0.899
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_1395935222",
+      "target_name": "Lê Duẩn",
+      "lag_minutes": 20,
+      "peak_correlation": 0.899
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_1395935224",
+      "target_name": "Công trường Công xã Paris",
+      "lag_minutes": 20,
+      "peak_correlation": 0.899
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_35114262",
+      "target_name": "Công trường Công xã Paris",
+      "lag_minutes": 20,
+      "peak_correlation": 0.898
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_758852506",
+      "target_name": "Lê Duẩn",
+      "lag_minutes": 20,
+      "peak_correlation": 0.898
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_803279638",
+      "target_name": "Lê Duẩn",
+      "lag_minutes": 20,
+      "peak_correlation": 0.898
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_747231131",
+      "target_name": "Pasteur",
+      "lag_minutes": 20,
+      "peak_correlation": 0.898
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_1391882258",
+      "target_name": "Công trường Công xã Paris",
+      "lag_minutes": 20,
+      "peak_correlation": 0.898
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_1395935222",
+      "target_name": "Lê Duẩn",
+      "lag_minutes": 20,
+      "peak_correlation": 0.898
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_1395935224",
+      "target_name": "Công trường Công xã Paris",
+      "lag_minutes": 20,
+      "peak_correlation": 0.898
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_686500792",
+      "target_name": "Pasteur",
+      "lag_minutes": 20,
+      "peak_correlation": 0.897
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_678315476",
+      "target_name": "Pasteur",
+      "lag_minutes": 20,
+      "peak_correlation": 0.897
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_678315476",
+      "target_name": "Pasteur",
+      "lag_minutes": 15,
+      "peak_correlation": 0.896
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_686500792",
+      "target_name": "Pasteur",
+      "lag_minutes": 20,
+      "peak_correlation": 0.895
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_678315474",
+      "target_name": "Pasteur",
+      "lag_minutes": 20,
+      "peak_correlation": 0.895
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_678315474",
+      "target_name": "Pasteur",
+      "lag_minutes": 20,
+      "peak_correlation": 0.894
+    }
+  ]
+}

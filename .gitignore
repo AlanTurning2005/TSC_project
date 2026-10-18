@@ -23,3 +23,9 @@ sumo_scenarios/**/queue.xml
 *.env
 macro_traffic_crawler/.env
 
+# .gitignore
+.env
+*.pyc
+__pycache__/
+venv/
+

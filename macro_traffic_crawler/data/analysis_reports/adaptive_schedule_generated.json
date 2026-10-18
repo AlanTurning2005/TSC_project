@@ -1,0 +1,119 @@
+{
+  "generated_at": "2026-10-15T14:18:16.623813",
+  "total_sampling_points": 66,
+  "target_api_keys": 10,
+  "max_allowed_requests": 24800,
+  "projected_daily_rounds": 340,
+  "projected_daily_requests": 22440,
+  "safety_buffer_requests": 2360,
+  "schedule": [
+    {
+      "name": "Đêm khuya (Free-flow baseline)",
+      "hour_start": "00:00",
+      "hour_end": "06:00",
+      "interval_sec": 1800,
+      "interval_min": 30,
+      "level": "DEM_KHUYA",
+      "empirical_ci": 0.083,
+      "empirical_cv": 0.275,
+      "rounds_est": 12,
+      "requests_est": 792
+    },
+    {
+      "name": "Chuyển tiếp sáng (Ramp-up)",
+      "hour_start": "06:00",
+      "hour_end": "06:45",
+      "interval_sec": 240,
+      "interval_min": 4,
+      "level": "CHUYEN_TIEP_SANG",
+      "empirical_ci": 0.275,
+      "empirical_cv": 0.346,
+      "rounds_est": 11,
+      "requests_est": 726
+    },
+    {
+      "name": "Siêu cao điểm sáng (Chạm điểm uốn 06:55)",
+      "hour_start": "06:45",
+      "hour_end": "09:15",
+      "interval_sec": 120,
+      "interval_min": 2,
+      "level": "SIEU_CAO_DIEM_SANG",
+      "empirical_ci": 0.424,
+      "empirical_cv": 0.447,
+      "rounds_est": 75,
+      "requests_est": 4950
+    },
+    {
+      "name": "Thấp điểm trưa (Inter-peak)",
+      "hour_start": "09:15",
+      "hour_end": "11:30",
+      "interval_sec": 300,
+      "interval_min": 5,
+      "level": "THAP_DIEM_TRUA",
+      "empirical_ci": 0.506,
+      "empirical_cv": 0.522,
+      "rounds_est": 27,
+      "requests_est": 1782
+    },
+    {
+      "name": "Cao điểm trưa (Lunch surge)",
+      "hour_start": "11:30",
+      "hour_end": "13:30",
+      "interval_sec": 180,
+      "interval_min": 3,
+      "level": "CAO_DIEM_TRUA",
+      "empirical_ci": 0.479,
+      "empirical_cv": 0.504,
+      "rounds_est": 40,
+      "requests_est": 2640
+    },
+    {
+      "name": "Thấp điểm chiều",
+      "hour_start": "13:30",
+      "hour_end": "16:30",
+      "interval_sec": 300,
+      "interval_min": 5,
+      "level": "THAP_DIEM_CHIEU",
+      "empirical_ci": 0.477,
+      "empirical_cv": 0.488,
+      "rounds_est": 36,
+      "requests_est": 2376
+    },
+    {
+      "name": "Siêu cao điểm chiều/tối (Giải tỏa lúc 19:25)",
+      "hour_start": "16:30",
+      "hour_end": "19:30",
+      "interval_sec": 120,
+      "interval_min": 2,
+      "level": "SIEU_CAO_DIEM_CHIEU",
+      "empirical_ci": 0.522,
+      "empirical_cv": 0.511,
+      "rounds_est": 90,
+      "requests_est": 5940
+    },
+    {
+      "name": "Buổi tối sinh hoạt / Phố đi bộ",
+      "hour_start": "19:30",
+      "hour_end": "22:00",
+      "interval_sec": 240,
+      "interval_min": 4,
+      "level": "TOI_SINH_HOAT",
+      "empirical_ci": 0.38,
+      "empirical_cv": 0.422,
+      "rounds_est": 37,
+      "requests_est": 2442
+    },
+    {
+      "name": "Hạ nhiệt ban đêm (Cool-down)",
+      "hour_start": "22:00",
+      "hour_end": "24:00",
+      "interval_sec": 600,
+      "interval_min": 10,
+      "level": "HA_NHIET_DEM",
+      "empirical_ci": 0.241,
+      "empirical_cv": 0.373,
+      "rounds_est": 12,
+      "requests_est": 792
+    }
+  ]
+}

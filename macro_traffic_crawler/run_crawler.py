@@ -32,11 +32,36 @@ from config import (
 )
 from tomtom_client import TomTomTrafficClient
 
-def estimate_bpr_volume(current_time: float, free_time: float, capacity: float = 1200.0, alpha: float = 0.15, beta: float = 4.0) -> float:
+# ==============================================================================
+# KHẢ NĂNG THÔNG HÀNH TÍNH TOÁN CỦA MỘT LÀN XE (P_tt)
+# Tham chiếu theo TCVN 104:2007 (Mục 8.2 và Bảng 7 - Mức phục vụ đường phố):
+# Đơn vị: PCU/làn/giờ (xe con quy đổi/làn/giờ)
+# ==============================================================================
+CAPACITY_PER_LANE_BY_FRC = {
+    "FRC0": 1800.0,  # Đường cao tốc đô thị (dòng xe liên tục, cách ly không đèn đỏ)
+    "FRC1": 1500.0,  # Đường phố chính đô thị chủ yếu (Bảng 10: >= 6 làn, P_tt ~ 1500)
+    "FRC2": 1500.0,  # Đường phố chính đô thị thứ yếu (Bảng 10: >= 4 làn)
+    "FRC3": 1200.0,  # Đường phố chính khu vực (P_tt ~ 1200)
+    "FRC4": 1000.0,  # Đường phố gom (P_tt ~ 1000)
+    "FRC5": 600.0,   # Đường phố nội bộ nhánh lớn (P_tt ~ 600)
+    "FRC6": 600.0    # Đường phố nội bộ hẻm nhỏ
+}
+
+def calculate_segment_capacity(frc: str, lanes: int = 1) -> float:
     """
-    Uoc tinh luu luong xe (vehicles/hour) dua tren ham BPR (Bureau of Public Roads):
+    Tính tổng Khả năng thông hành của toàn bộ đoạn đường (Total Capacity C).
+    C_total = P_tt (theo FRC) * số làn xe
+    """
+    base_cap = CAPACITY_PER_LANE_BY_FRC.get(frc.upper(), 1200.0)
+    return round(base_cap * max(1, lanes), 1)
+
+def estimate_bpr_volume(current_time: float, free_time: float, capacity: float = 1200.0, alpha: float = 0.35, beta: float = 2.5) -> float:
+    """
+    Uoc tinh luu luong xe (vehicles/hour) dua tren ham BPR hieu chinh cho dong xe TP.HCM:
+    Tham chieu: NCHRP Report 387, TCVN 104:2007, Vu & Shimizu (2014)
     T = T_0 * (1 + alpha * (V/C)^beta)
     => V = C * ((T / T_0 - 1) / alpha) ^ (1/beta)
+    alpha = 0.35 (ma sat ngang som cua xe may), beta = 2.5 (do doc mem do xe may luon lach)
     """
     if free_time <= 0 or current_time <= free_time:
         return 0.0
@@ -79,6 +104,7 @@ def run_snapshot_collection(client: TomTomTrafficClient, points_file: Path, limi
         road_name = row["road_name"]
         lat = float(row["lat"])
         lon = float(row["lon"])
+        lanes = int(row.get("lanes", 1))
 
         flow = client.get_flow_segment(lat, lon)
         if not flow:
@@ -89,14 +115,21 @@ def run_snapshot_collection(client: TomTomTrafficClient, points_file: Path, limi
             "road_name": road_name,
             "lat": lat,
             "lon": lon,
+            "lanes": lanes,
             "timestamp": iso_time_str,
             "data": flow.get("raw_response", {})
         })
 
-        # Tinh toan feature vi mo cho Micro hoa
+        # Tinh toan nang luc thong hanh va feature vi mo cho Micro hoa
         curr_t = flow["current_travel_time"]
         free_t = flow["free_flow_travel_time"]
-        est_volume = estimate_bpr_volume(curr_t, free_t, capacity=1200.0)
+        frc_code = flow.get("frc", "FRC1")
+
+        # Tinh tong nang luc doan duong theo so lan xe va quy chuan TCVN
+        segment_capacity = calculate_segment_capacity(frc_code, lanes)
+
+        # Uoc tinh luu luong bang BPR voi Capacity thuc te
+        est_volume = estimate_bpr_volume(curr_t, free_t, capacity=segment_capacity)
         arrival_rate_vps = round(est_volume / 3600.0, 4)
 
         processed_records.append({
@@ -108,7 +141,9 @@ def run_snapshot_collection(client: TomTomTrafficClient, points_file: Path, limi
             "highway_type": row.get("highway_type", "primary"),
             "lat": lat,
             "lon": lon,
-            "frc": flow["frc"],
+            "lanes": lanes,
+            "frc": frc_code,
+            "road_capacity_pcu": segment_capacity,
             "current_speed_kmh": flow["current_speed"],
             "free_flow_speed_kmh": flow["free_flow_speed"],
             "current_travel_time_s": curr_t,
@@ -123,8 +158,9 @@ def run_snapshot_collection(client: TomTomTrafficClient, points_file: Path, limi
         })
 
         print(f"  [{idx+1}/{len(df_points)}] {road_name} ({point_id}): "
+              f"Lanes={lanes}, Cap={segment_capacity:.0f} PCU/h, "
               f"Speed={flow['current_speed']}/{flow['free_flow_speed']} km/h, "
-              f"Delay={flow['delay_seconds']}s, Congestion={flow['congestion_index']*100:.1f}%")
+              f"Vol={est_volume} vph")
 
     # 1. Luu RAW JSON snapshot
     RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -135,7 +171,8 @@ def run_snapshot_collection(client: TomTomTrafficClient, points_file: Path, limi
 
     # 2. Luu PROCESSED CSV history
     PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
-    processed_file = PROCESSED_DATA_DIR / "macro_traffic_history.csv"
+    # processed_file = PROCESSED_DATA_DIR / "macro_traffic_history.csv"
+    processed_file = PROCESSED_DATA_DIR / "macro_traffic_dense_1min.csv"
     df_new = pd.DataFrame(processed_records)
 
     if processed_file.exists() and os.path.getsize(processed_file) > 0:
@@ -154,7 +191,7 @@ def main():
     parser = argparse.ArgumentParser(description="TomTom Macro Traffic Data Collector")
     parser.add_argument("--mode", choices=["once", "loop"], default="once", help="Che do chay: 'once' (1 lan) hoac 'loop' (dinh ky)")
     parser.add_argument("--interval", type=int, default=CRAWL_INTERVAL_SECONDS, help="Khoang thoi gian lap lai giua cac vong (giay)")
-    parser.add_argument("--limit", type=int, default=10, help="Gioi han so diem do crawl moi vong (mac dinh 10 de tiet kiem quota)")
+    parser.add_argument("--limit", type=int, default=None, help="Gioi han so diem do crawl moi vong (mac dinh None la crawl toan bo sampling_points)")
     parser.add_argument("--mock", action="store_true", help="Ep buoc chay che do Mock data (khong ton API quota)")
 
     args = parser.parse_args()

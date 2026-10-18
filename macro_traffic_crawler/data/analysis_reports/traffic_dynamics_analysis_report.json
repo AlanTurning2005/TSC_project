@@ -1,0 +1,193 @@
+{
+  "metadata": {
+    "total_records": 11352,
+    "sampling_points": 66,
+    "time_range_start": "2026-10-14T07:03:09.933438",
+    "time_range_end": "2026-10-15T14:14:48.677818",
+    "duration_hours": 31.19
+  },
+  "inflection_points_count": 3,
+  "key_inflection_points": [
+    {
+      "time": "2026-10-14 19:25",
+      "type": "Congestion Dissipation (Bắt đầu giải tỏa)",
+      "v_kmh": 18.0,
+      "congestion_index": 0.444,
+      "dv_dt": 4.03
+    },
+    {
+      "time": "2026-10-15 06:55",
+      "type": "Onset of Congestion (Bắt đầu nghẽn)",
+      "v_kmh": 20.1,
+      "congestion_index": 0.362,
+      "dv_dt": -6.37
+    },
+    {
+      "time": "2026-10-15 07:05",
+      "type": "Onset of Congestion (Bắt đầu nghẽn)",
+      "v_kmh": 19.4,
+      "congestion_index": 0.391,
+      "dv_dt": -4.55
+    }
+  ],
+  "top_bottlenecks": [
+    {
+      "point_id": "way_193616433",
+      "road_name": "Nam Kỳ Khởi Nghĩa",
+      "ci_mean": 0.46188662790697677,
+      "ci_max": 0.75,
+      "congested_ratio": 0.7151162790697675
+    },
+    {
+      "point_id": "way_747226799",
+      "road_name": "Lê Duẩn",
+      "ci_mean": 0.46103313953488373,
+      "ci_max": 0.7778,
+      "congested_ratio": 0.7151162790697675
+    },
+    {
+      "point_id": "way_608262688",
+      "road_name": "Nam Ky Khoi Nghia",
+      "ci_mean": 0.46092093023255815,
+      "ci_max": 0.75,
+      "congested_ratio": 0.7209302325581395
+    },
+    {
+      "point_id": "way_1182181717",
+      "road_name": "Lê Duẩn",
+      "ci_mean": 0.4606598837209302,
+      "ci_max": 0.7778,
+      "congested_ratio": 0.7209302325581395
+    },
+    {
+      "point_id": "way_1265822570",
+      "road_name": "Unnamed Road",
+      "ci_mean": 0.4601924418604651,
+      "ci_max": 0.7778,
+      "congested_ratio": 0.7209302325581395
+    },
+    {
+      "point_id": "way_1374006570",
+      "road_name": "Công trường Công xã Paris",
+      "ci_mean": 0.46012965116279064,
+      "ci_max": 0.7778,
+      "congested_ratio": 0.7209302325581395
+    },
+    {
+      "point_id": "way_1414094279",
+      "road_name": "Unnamed Road",
+      "ci_mean": 0.4596488372093023,
+      "ci_max": 0.7778,
+      "congested_ratio": 0.7267441860465116
+    },
+    {
+      "point_id": "way_35114262",
+      "road_name": "Công trường Công xã Paris",
+      "ci_mean": 0.4575755813953489,
+      "ci_max": 0.7778,
+      "congested_ratio": 0.6976744186046512
+    },
+    {
+      "point_id": "way_678315474",
+      "road_name": "Pasteur",
+      "ci_mean": 0.45643430232558135,
+      "ci_max": 0.7917,
+      "congested_ratio": 0.7034883720930233
+    },
+    {
+      "point_id": "way_686500792",
+      "road_name": "Pasteur",
+      "ci_mean": 0.4555656976744185,
+      "ci_max": 0.7917,
+      "congested_ratio": 0.7034883720930233
+    }
+  ],
+  "cluster_summary": {
+    "Cụm 1: Điểm nghẽn nghiêm trọng (Core Bottlenecks)": 36,
+    "Cụm 3: Thông thoáng ổn định (Steady / Free-Flow)": 18,
+    "Cụm 2: Xung động / Nhạy cảm (Surge-Prone / Volatile)": 12
+  },
+  "consequence_pairs_count": 41,
+  "top_causal_pairs": [
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_747226799",
+      "target_name": "Lê Duẩn",
+      "lag_minutes": 25,
+      "peak_correlation": 0.95
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_1374006570",
+      "target_name": "Công trường Công xã Paris",
+      "lag_minutes": 10,
+      "peak_correlation": 0.95
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_1414094279",
+      "target_name": "Unnamed Road",
+      "lag_minutes": 10,
+      "peak_correlation": 0.95
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_1414094279",
+      "target_name": "Unnamed Road",
+      "lag_minutes": 25,
+      "peak_correlation": 0.949
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_1265822570",
+      "target_name": "Unnamed Road",
+      "lag_minutes": 10,
+      "peak_correlation": 0.949
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_747226799",
+      "target_name": "Lê Duẩn",
+      "lag_minutes": 20,
+      "peak_correlation": 0.948
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_1265822570",
+      "target_name": "Unnamed Road",
+      "lag_minutes": 25,
+      "peak_correlation": 0.948
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_1374006570",
+      "target_name": "Công trường Công xã Paris",
+      "lag_minutes": 10,
+      "peak_correlation": 0.948
+    },
+    {
+      "source_id": "way_608262688",
+      "source_name": "Nam Ky Khoi Nghia",
+      "target_id": "way_1182181717",
+      "target_name": "Lê Duẩn",
+      "lag_minutes": 25,
+      "peak_correlation": 0.948
+    },
+    {
+      "source_id": "way_193616433",
+      "source_name": "Nam Kỳ Khởi Nghĩa",
+      "target_id": "way_1182181717",
+      "target_name": "Lê Duẩn",
+      "lag_minutes": 20,
+      "peak_correlation": 0.946
+    }
+  ]
+}
