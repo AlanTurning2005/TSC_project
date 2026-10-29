@@ -1,13 +1,13 @@
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
     <input>
         <!-- Bản đồ mạng lưới giao thông Quận 1 & Hồ Con Rùa -->
-        <net-file value="data/raw_data/q1_map.net.xml"/>
+        <net-file value="../../data/raw_data/q1_map.net.xml"/>
 
         <!-- Tuyến đường xe đã được hiệu chuẩn từ dữ liệu TomTom 1-phút -->
         <route-files value="calibrated_routes.rou.xml"/>
 
         <!-- Định nghĩa mô hình xe máy Việt Nam (Sublane Model) & phân tầng phương tiện -->
-        <additional-files value="data/raw_data/vtypes.add.xml"/>
+        <additional-files value="../../data/raw_data/vtypes.add.xml"/>
     </input>
 
     <time>

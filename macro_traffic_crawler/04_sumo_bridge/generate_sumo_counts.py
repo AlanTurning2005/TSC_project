@@ -16,9 +16,17 @@ import sys
 import math
 import xml.etree.ElementTree as ET
 import pandas as pd
+import numpy as np
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, Tuple, List, Optional
+
+# Đảm bảo đường dẫn module luôn khả dụng
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_MODULE_ROOT = _SCRIPT_DIR.parent
+for p in [_SCRIPT_DIR, _MODULE_ROOT]:
+    if str(p) not in sys.path:
+        sys.path.insert(0, str(p))
 
 # Hỗ trợ Windows terminal encoding
 if sys.platform == "win32":
@@ -219,45 +227,32 @@ def generate_sumo_counts(
     output_xml: Path,
     target_date: Optional[str] = None,
     start_time: Optional[str] = None,
-    end_time: Optional[str] = None
+    end_time: Optional[str] = None,
+    alpha: float = 0.35,
+    beta: float = 2.5,
+    simulation_duration: Optional[int] = None
 ):
     print(f"\n==================================================")
-    print(f"[*] BAT DAU CHUYEN DOI DU LIEU TOMTOM SANG SUMO EDGE COUNTS")
+    print(f"[*] BAT DAU CHUYEN DOI DU LIEU TOMTOM SANG SUMO EDGE COUNTS (alpha={alpha}, beta={beta})")
     print(f"==================================================")
 
     if not history_csv.exists():
         print(f"[!] Khong tim thay file: {history_csv}")
-        return False
+        return {}
     if not network_xml.exists():
         print(f"[!] Khong tim thay file: {network_xml}")
-        return False
+        return {}
 
     df = pd.read_csv(history_csv)
     print(f"[*] Doc duoc {len(df)} records tu file lich su crawl.")
 
-    # Tự động tính toán lại lưu lượng BPR theo chuẩn Việt Nam (alpha=0.35, beta=2.5) từ thời gian hành trình thực tế
-    from run_crawler import estimate_bpr_volume
-    if "current_travel_time_s" in df.columns and "free_flow_travel_time_s" in df.columns:
-        print("[*] Dang tinh toan lai luu luong BPR theo chuan Viet Nam (alpha=0.35, beta=2.5)...")
-        df["est_volume_vph"] = df.apply(
-            lambda r: estimate_bpr_volume(
-                float(r["current_travel_time_s"]),
-                float(r["free_flow_travel_time_s"]),
-                capacity=float(r.get("road_capacity_pcu", 1200.0)),
-                alpha=0.35,
-                beta=2.5
-            ),
-            axis=1
-        )
-        df["arrival_rate_vps"] = (df["est_volume_vph"] / 3600.0).round(4)
-
-    # 1. Xác định khung thời gian và tính thời lượng thực tế
+    # 1. Xác định khung thời gian và lọc dữ liệu trước
     df["dt"] = pd.to_datetime(df["timestamp"])
     if target_date:
         df = df[df["date"] == target_date]
         if df.empty:
             print(f"[!] Khong co du lieu cho ngay {target_date}!")
-            return False
+            return {}
 
     if start_time:
         st = pd.to_datetime(start_time).time()
@@ -268,11 +263,25 @@ def generate_sumo_counts(
 
     if df.empty:
         print(f"[!] Khong co du lieu trong khung gio {start_time} -> {end_time}!")
-        return False
+        return {}
+
+    # 2. Tự động tính toán lại lưu lượng BPR (Vectorized siêu tốc)
+    if "current_travel_time_s" in df.columns and "free_flow_travel_time_s" in df.columns:
+        t = pd.to_numeric(df["current_travel_time_s"], errors="coerce").fillna(0).values
+        t0 = pd.to_numeric(df["free_flow_travel_time_s"], errors="coerce").fillna(1).values
+        cap = pd.to_numeric(df["road_capacity_pcu"] if "road_capacity_pcu" in df.columns else 1200.0, errors="coerce").fillna(1200.0).values
+
+        ratio = np.maximum(0.0, (t - t0) / np.maximum(1e-3, alpha * t0))
+        vol = np.where(t <= t0, 0.05 * cap, cap * np.power(ratio, 1.0 / beta))
+        df["est_volume_vph"] = np.nan_to_num(vol, nan=0.0)
+        df["arrival_rate_vps"] = (df["est_volume_vph"] / 3600.0).round(4)
 
     min_time = df["dt"].min()
     max_time = df["dt"].max()
-    time_diff_seconds = max(300, int((max_time - min_time).total_seconds()))
+    if simulation_duration is not None and simulation_duration > 0:
+        time_diff_seconds = int(simulation_duration)
+    else:
+        time_diff_seconds = max(300, int((max_time - min_time).total_seconds()))
 
     print(f"[*] Khoang thoi gian du lieu: {min_time.strftime('%H:%M:%S')} -> {max_time.strftime('%H:%M:%S')}")
     print(f"[*] Thoi luong mo phong tu dong: {time_diff_seconds} giay (~{time_diff_seconds // 60} phut)")
@@ -370,7 +379,10 @@ def generate_sumo_counts(
     print(f"    - Thoi luong mo phong duoc cau hinh: {time_diff_seconds}s ({time_diff_seconds//60} phut)")
     print(f"    - Tong luong xe muc tieu can nap vao mo phong: {sum(r['target_count'] for r in mapped_records):,} xe")
     print(f"==================================================")
-    return True
+    
+    # Trả về dictionary lưu lượng mục tiêu quy đổi theo giờ (veh/h) cho từng edge để tính GEH
+    target_hourly_dict = {rec["edge_id"]: rec["physical_vph"] for rec in mapped_records}
+    return target_hourly_dict
 
 if __name__ == "__main__":
     import argparse
@@ -385,6 +397,10 @@ if __name__ == "__main__":
                         help="Giờ bắt đầu (HH:MM hoặc HH:MM:SS, ví dụ: 17:00)")
     parser.add_argument("--end-time", "-e", type=str, default=None,
                         help="Giờ kết thúc (HH:MM hoặc HH:MM:SS, ví dụ: 18:00)")
+    parser.add_argument("--alpha", type=float, default=0.35,
+                        help="Tham số alpha của hàm BPR (mặc định: 0.35)")
+    parser.add_argument("--beta", type=float, default=2.5,
+                        help="Tham số beta của hàm BPR (mặc định: 2.5)")
     args = parser.parse_args()
 
     input_path = Path(args.input)
@@ -400,5 +416,7 @@ if __name__ == "__main__":
         output_xml=Path(args.output),
         target_date=args.date,
         start_time=args.start_time,
-        end_time=args.end_time
+        end_time=args.end_time,
+        alpha=args.alpha,
+        beta=args.beta
     )

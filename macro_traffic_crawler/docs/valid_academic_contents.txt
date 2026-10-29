@@ -1,0 +1,176 @@
+KIỂM CHỨNG LỖI HỌC THUẬT VỀ SỐ LIỆU, TÍNH ĐÚNG ĐẮN. 
+
+Kiểm tra ở đâu : Được kiểm tra trên từng file docs dựa theo tài liệu tham khảo.
+
+Mục tiêu: chuẩn hóa, tự xác nhận, chính xác hóa các kiến thức, số liệu của từng file md
+
+Thang đo mức độ vấn đề: 
+
+    - Nặng : Tự bịa số liệu, tự bịa kiến thức
+    
+    - Trung bình: Sai lệch số liệu, trình bày kiến thức chưa chuẩn 100% theo định nghĩa/ tiêu chí học thuật
+
+    - Nhẹ: Chưa cập nhật lại 
+
+    - Không: Không có sự sai lệch, tự bịa đặt
+
+Các file cần xem xét: 
+
+macro_traffic_crawler\docs\SIMULATION_DATA_GENERATION.md
+
+macro_traffic_crawler\docs\BPR_CALIBRATION_AND_BASELINE_EXPERIMENTS.md
+
+macro_traffic_crawler\docs\HCMC_TRAFFIC_SPECIFICATIONS_AND_THEORY.md
+
+macro_traffic_crawler\docs\MATHEMATICS STRUCTURES MODELING TSC.md
+
+macro_traffic_crawler\docs\SD_EVALUATION.md
+
+
+Xét file SIMULATION_DATA_GENERATION.md
+
+Mục tiêu [Không]
+Sơ đồ tổng thể [Không]
+BƯỚC 1: TRÍCH XUẤT VÀ DỰNG BẢN ĐỒ MẠNG LƯỚI SUMO [Không]
+BƯỚC 2: THU THẬP DỮ LIỆU MACRO TỪ TOMTOM TRAFFIC API/CHI TIẾT TỪNG BƯỚC THỰC HIỆN TRONG PIPELINE [Nhẹ] => Ban đầu sử dụng alpha,beta 0.15 và 4 tuy nhiên sau này hiệu chỉnh hai tham số này.
+BƯỚC 3: MÔ HÌNH HÓA NHU CẦU & ĐẶC TÍNH XE MÁY HỖN HỢP [Trung bình]. Chi tiết: 
+
+- Hãy chỉnh lại dùng số liệu của năm TCVN_13592_2022
+
+- Bảng quy đổi PCU: Xe máy -0.3 ; Xe ô tô con - 1.0; Xe být cỡ nhỏ/ lớn 2.5/3.0 
+
+- Tỉ lệ phân tầng [ trung bình]: Chưa có tham chiếu với papers nào, số liệu thật ra sao. giải thích hơi sơ sài. tài liệu: JICA & UBND TP.HCM (2004). The Study on Urban Transport Master Plan in the Ho Chi Minh City Metropolitan Area (HOUTRANS). Final Report, JICA.
+Không chỉ ra được tỉ lệ xe máy/ xe ô tô cụ thể là bao nhiêu. Hiểu sai, hoặc số liệu ước lượng, số liệu quá cũ.
+[Sửa] Analysis on Characteristics of Passenger Car and Motorcycle Fleets and Their Driving Conditions in Developing Country: A Case Study in Ho Chi Minh City, Vietnam
+1. Tỉ Lệ Cơ Cấu Phương Tiện Trên Đường (On-road Traffic Composition)
+
+Cơ cấu chung toàn đô thị:
+
+Xe máy (MC): Chiếm ưu thế tuyệt đối với 89% tổng lượng phương tiện lưu thông[2][3].
+
+Ô tô con (PC): Chiếm **6%**[2][3].
+
+Phương tiện khác (Xe buýt, xe tải, xe khách...): Chiếm 5% còn lại[2][3].
+
+Tỉ lệ lựa chọn phương tiện của người dân (Mode Choice):
+
+Khảo sát cho thấy 91% người dân sử dụng phương tiện cá nhân (trong đó xe máy chiếm khoảng 84%, ô tô con khoảng 10%)[4][5].
+
+Xe buýt công cộng chỉ chiếm 8% - 10% thị phần di chuyển[4][5].
+
+Cơ cấu lưu lượng và tỉ lệ phân tầng theo từng loại đường:
+
+Đường cao tốc / Trục chính lớn (Highway - ví dụ: Điện Biên Phủ, Xa lộ Hà Nội):
+
+Lưu lượng ô tô con: Trung bình 940.62 xe/giờ[6].
+
+Lưu lượng xe máy: Trung bình 9,800.92 xe/giờ[7].
+
+Tỉ lệ xe máy / ô tô: Số lượng xe máy gấp khoảng 10 lần ô tô con[8][9].
+
+Đường trục đô thị (Arterial - ví dụ: Xô Viết Nghệ Tĩnh):
+
+Lưu lượng ô tô con: Trung bình 171.08 xe/giờ (chỉ bằng 1/5 so với đường cao tốc)[6].
+
+Lưu lượng xe máy: Trung bình 6,441.85 xe/giờ[7].
+
+Tỉ lệ xe máy / ô tô: Số lượng xe máy gấp gần 40 lần ô tô con[8][9].
+
+Đường nội bộ / Khu dân cư (Residential - ví dụ: Đường D2):
+
+Lưu lượng ô tô con: Trung bình 95.38 xe/giờ (chỉ bằng 1/10 so với đường cao tốc)[6].
+
+Lưu lượng xe máy: Trung bình 3,872.31 xe/giờ[7].
+
+Tỉ lệ xe máy / ô tô: Số lượng xe máy gấp gần 40 lần ô tô con[8][9].
+
+Analysis of motorcycle microscopic characteristics at roundabouts under mixed traffic condition: A case study of Vietnam (2021):
+
+
+
+- Cấu hình Hành vi Xe máy Việt Nam (Sublane Model) trong vtypes.add.xml: []
+
+
+
+[Nặng]: 
+[4] Minh, Sano & Matsumoto (2005): tiêu đề và số trang không khớp. Hai bài thật của nhóm này trong JEASTS vol. 6 là “The speed, flow and headway analyses of motorcycle traffic”, tr. 1496–1508 và “Characteristics of Passing and Paired Riding Maneuvers of Motorcycle”, tr. 186–197. Tôi không tìm thấy bài “Maneuvers of Motorcycles… tr. 178–193”. 
+uom
+sagepub
+[5] Vu & Shimizu: tôi chỉ tìm được bài JEASTS 2010, vol. 8, tr. 1999–2017 về tương tác giữa các nhóm xe tại nút giao. Bài “Transport and Logistics Studies, 2014” trong danh sách thì tôi không xác nhận được. 
+jst
+[2] BPR (1964): một tài liệu năm 1964 không thể chứa hiệu chuẩn cho giao thông hỗn hợp Việt Nam. Theo hiểu biết của tôi, tham số BPR chuẩn là α=0,15 và β=4. Cặp α=0,35, β=2,5 tôi không tìm được nguồn.
+[1] TCVN 104:2007 “Bảng 2”, [3] Krajzewicz, [7] Tuan 2016: tôi không xác nhận được các nội dung này, nên không dùng làm căn cứ.
+
+
+
+HCMC_TRAFFIC_SPECIFICATIONS_AND_THEORY
+
+
+1. Danh mục trích dẫn (Chương 4)
+
+Sai hoặc không khớp
+
+Nguyen, Sano & Tran (2018), “…Sublane Model in SUMO”, Transp. Res. Procedia 34: tôi không tìm thấy bài này. Đây là nguồn file dùng nhiều nhất (lcPushy, minGap, minGapLat), nên rủi ro lớn nhất nằm ở đây.
+Minh, Sano & Matsumoto (2005): tiêu đề và số trang sai. Hai bài thật trong JEASTS vol. 6 là “The speed, flow and headway analyses of motorcycle traffic”, tr. 1496–1508 và bài về passing và paired riding maneuvers, tr. 186–197. Không có bài “Maneuvers of Motorcycles… tr. 198–213”. 
+eurecom
+sagepub
+Lan, Lin & Fang (2010), TR-B “cell-transmission”: bài thật của nhóm này là Lan, Chiou, Lin, Hsu (2010), “Cellular automaton simulations for mixed traffic with erratic motorcycles’ behaviours”, Physica A 389(10):2077–2089. Bài này là mô hình cellular automaton, không phải nguồn cho khoảng cách ngang 15–25 cm. 
+eurecom
+Erdmann (2015): bài này về mô hình chuyển làn, đăng ở kỷ yếu SUMO2014, “Modeling Mobility with Open Data”. Tiêu đề kỷ yếu trong file không khớp. Sublane model cũng không thuộc bài này, vì tài liệu SUMO dẫn Semrau & Erdmann (SUMO 2016) làm nguồn mô tả mô hình. 
+eurecom
+dlr
+Singh (1999), TRR 1678, tr. 170–176: không khớp. Singh có “Beyond the BPR Curve” (hội nghị 1995) và Singh & Donnelly (1999), kỷ yếu hội nghị TRB lần 7, tr. 340–349. Trong TRR 1678, tr. 64–72 là bài của Zhou & Hall về đường cao tốc ở Toronto. Các bài này đều không nói về “developing cities”. 
+BEYOND THE BPR CURVE: UPDATING SPEED-FLOW AND SPEED-CAPACITY RELATIONSHIPS IN TRAFFIC ASSIGNMENT
+ +2
+HOUTRANS “2014”: báo cáo cuối cùng ra tháng 6/2004. 
+jica
+TCVN 104:2007: tên chuẩn là TCXDVN 104:2007, do Bộ Xây dựng ban hành, không phải Bộ KH&CN. Tiêu chuẩn này cũng đã được cập nhật thành TCVN 13592:2022. 
+vanbanphapluat
+vista
+
+Chưa xác nhận được: Kumar & Rao (2013), tôi chỉ thấy các bài năm 1998 của họ.
+
+Đúng: Thông tư 31/2019/TT-BGTVT (ban hành 29/08/2019), BPR 1964, Krauß 1998.
+
+2. Số liệu quy chuẩn (Chương 1)
+PCU xe máy = 0,30: con số có thật, nhưng nằm ở TCVN 4054:2005 Bảng 2. Bảng này ghi xe máy 0,3, xe con 1,0, xe tải 2 trục và xe buýt dưới 25 chỗ 2,0, xe buýt lớn 2,5 (vùng đồng bằng và đồi). 
+atld
+Bảng 2 của TCXDVN 104 thì chia theo tốc độ thiết kế (≥60, 30–50, ≤20 km/h). Tôi không thấy điều kiện “dải phân cách sơn kẻ”, và không đọc được giá trị cụ thể vì bản đầy đủ bị khóa. 
+slideshare
+Xe tải nhẹ 1,5 (“TCVN 4054 Bảng 3”): không khớp, Bảng 2 ghi 2,0. Xe buýt 2,0 chỉ đúng với buýt dưới 25 chỗ, còn buýt đô thị 10–12 m thuộc nhóm 2,5 theo bảng trên.
+“Bảng 10 = năng lực thông hành”: sai. Bảng 10 là bề rộng làn xe. Năng lực nằm ở Bảng 3, tính theo loại đường (ví dụ đường 2 làn 2 chiều tối đa 2.800 xcqđ/h cho cả 2 làn). Điều 8.2.2 là công thức tính số làn xe. Các cấp “FRC0–FRC6” và giá trị 1.800/1.500/1.200/1.000/600 không có trong tiêu chuẩn theo những gì tôi tìm được. FRC là phân loại của dữ liệu bản đồ. 
+TCXDVN 104:2007 Tiêu Chuẩn Thiết Kế Đường Đô Thị Việt Nam - Studocu
+ +2
+Tỉ lệ 85/12/3, 92/8/0, 96/4/0: tôi không tìm thấy nguồn, và cũng không thể gán cho HOUTRANS. Để đối chiếu, khảo sát TP.HCM cho thấy tỉ lệ xe máy/ô tô con khoảng 10 lần trên cao tốc và gần 40 lần trên đường chính và đường khu dân cư. Tỉ lệ ngầm trong file là khoảng 7, 11,5 và 24 lần. Hai tập số liệu khác phạm vi (Quận 1 so với toàn thành phố), nhưng file vẫn cần tự đo hoặc nêu rõ là giả định. 
+researchgate
+Tốc độ pháp lý 50 km/h: đúng cho đường hai chiều không dải phân cách hoặc một chiều một làn. Đường đôi hoặc một chiều từ 2 làn trở lên là 60 km/h, và xe gắn máy là 40 km/h. Nhiều đường một chiều ở Quận 1 thuộc nhóm 60 km/h. Ngoài ra đã có dự thảo thông tư thay thế TT 31/2019 theo Luật Đường bộ 2024, bạn nên kiểm tra hiệu lực hiện hành. 
+doanhnhanplus
+lsvn
+TomTom (66 tuyến, v₀ = 30,09 km/h): dữ liệu nội bộ của dự án, tôi không kiểm chứng được. Phép đổi 30,09 km/h ≈ 8,36 m/s và 35 km/h ≈ 9,72 m/s thì đúng.
+3. Thông số SUMO (Chương 2)
+lcSublane = 1.0 “tối đa”: sai. Tài liệu SUMO ghi 1,0 là giá trị mặc định, khoảng giá trị [0, ∞). 
+dlr
+lcPushy = 0.8 “hiệu chuẩn tại Điện Biên Phủ & CMT8”: không có nguồn kiểm chứng, vì bài gốc không tìm thấy. Mặc định là 0. Codeca & Härri thử từ 0 đến 1 và dùng 0,25 trong kịch bản đa phương thức, đồng thời nói rõ cần dữ liệu thực để hiệu chuẩn. 
+eurecom
+minGapLat = 0.2: mặc định là 0,6 m và đội SUMO khuyên hạ xuống để giảm né ngang. Nhưng theo họ, độ rộng xe được làm tròn lên thành số sublane nguyên khi lập kế hoạch. Với lateral-resolution = 0.8 và xe rộng 0,8 m, khe 0,2 m có thể gần như không phát huy tác dụng. Đây là suy luận của tôi, bạn nên thử nghiệm. 
+eclipse
+eclipse
+lateral-resolution = 0.8: các nghiên cứu xe hai bánh dùng độ phân giải mịn hơn nhiều: 0,2 m (nghiên cứu seepage), 0,3 m (Monaco). Giá trị 0,8 mà đội SUMO gợi ý là để xử lý lỗi xe ô tô lệch tâm làn, không phải cho xe máy. 
+sciencedirect
+eclipse
+accel = 2.5 theo “Chu Công Minh 2005”: hai bài Minh 2005 viết về vận tốc, lưu lượng, headway và hành vi vượt. Tôi không thấy số liệu gia tốc 2,2–2,6 so với 1,5–2,0 m/s². Tài liệu SUMO cũng lưu ý accel mặc định là mức “thoải mái”, không phải mức tối đa của xe. 
+dlr
+decel = 4.5 theo TCVN 104: vô lý, vì tiêu chuẩn thiết kế đường không quy định gia tốc hãm của xe máy.
+minGap = 0.5: hợp lý so với các nghiên cứu khác (Kuo 2023 nói khoảng cách này nên nhỏ hơn ô tô), nhưng nguồn “Nguyen 2018/2020” không xác nhận được. 
+easts
+latAlignment = arbitrary: đúng, Codeca & Härri dùng giá trị này cho xe máy.
+maxSpeed = 9.72: đây là lựa chọn thiết kế chứ không phải chuẩn. Phép tính trong mục 2.3 sai: 2,5 m/s² × 4 s = 10 m/s ≈ 36 km/h, không phải 45–50 km/h (cần khoảng 5–5,6 s). Con số “sai số +15–20 km/h” cũng không có dữ liệu.
+4. Chương 3 (BPR)
+Công thức nghịch đảo đúng về toán.
+α = 0,50–0,65 và β = 1,8–2,5 không có trích dẫn trực tiếp. Chúng cũng mâu thuẫn với danh sách tham chiếu trước của bạn (α = 0,35, β = 2,5). Theo hiểu biết của tôi, BPR chuẩn là 0,15 và 4, đúng như file ghi.
+Hệ số 2,27 chỉ đúng cho tầng Primary (0,85×0,3 + 0,12×1 + 0,03×2 ≈ 0,435). Với Secondary và Tertiary, hệ số lần lượt khoảng 2,8 và 3,0.
+5. Nên làm gì
+
+Nguồn tôi đã xác nhận là có thật và dùng được: Dung và cộng sự (JEASTS 11, 2015), Kuo, Chen & Wong (EASTS 14, 2023), Codeca & Härri (2019), tài liệu SUMO, hai bài Minh 2005 đúng tiêu đề, TCVN 4054:2005 Bảng 2 và TT 31/2019.
+
+Những giá trị không có nguồn (lcPushy, minGapLat, accel, α, β, tỉ lệ modal split) nên ghi là “giả định, cần hiệu chuẩn” thay vì gắn trích dẫn.

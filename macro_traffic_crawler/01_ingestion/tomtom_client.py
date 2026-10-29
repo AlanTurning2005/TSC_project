@@ -4,10 +4,18 @@ Client ket noi TomTom Traffic Flow API (Flow Segment Data),
 co co che retry, rate-limiting, error handling va mock-mode khi chua co API key.
 """
 
+import sys
 import time
 import random
 import requests
+from pathlib import Path
 from typing import Dict, Any, Optional
+
+# Đảm bảo import config từ thư mục gốc macro_traffic_crawler
+_MODULE_ROOT = Path(__file__).resolve().parent.parent
+if str(_MODULE_ROOT) not in sys.path:
+    sys.path.insert(0, str(_MODULE_ROOT))
+
 from config import TOMTOM_API_KEY, TOMTOM_FLOW_URL, REQUEST_DELAY_SECONDS
 
 class QuotaExceededError(Exception):

@@ -32,8 +32,8 @@ try:
 except Exception:
     pass
 
-# Cấu hình đường dẫn
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Cấu hình đường dẫn trỏ về thư mục macro_traffic_crawler
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(BASE_DIR, "data", "processed", "macro_traffic_history.csv")
 REPORT_DIR = os.path.join(BASE_DIR, "data", "analysis_reports")
 FIG_DIR = os.path.join(REPORT_DIR, "figures")

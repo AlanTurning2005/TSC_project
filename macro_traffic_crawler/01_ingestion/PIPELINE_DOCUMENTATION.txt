@@ -188,3 +188,37 @@ Congdanh@123,
 
 use: 
 python macro_traffic_crawler\scheduled_crawler.py --all-day --interval 600
+
+
+================================================================================================================================================
+    TÌM HIỂU VỀ KHUNG TOÁN HỌC ĐỂ GIẢI QUYẾT BÀI TOÁN MARL IN TRAFFIC SIGNAL CONTROL
+    https://docs.google.com/document/d/1lA3-sY6H52U--WKXuxdmQCuHdt5L6pAUvrfKbxqVpNI/edit?tab=t.0
+
+================================================================================================================================================
+    EVALUATION METRICS  CHO SIMULATION DATA
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ CẤP ĐỘ 4: KIỂM ĐỊNH MÔI TRƯỜNG MARL DEC-POMDP (CONTROLLABILITY & STABILITY) │
+│ • Độ nhạy hành động (Action Sensitivity) • Tỷ lệ Teleport (< 1%)            │
+│ • Tương quan Thưởng - Mục tiêu (Reward Alignment) • Variance qua Random Seeds│
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+┌──────────────────────────────────────▼──────────────────────────────────────┐
+│ CẤP ĐỘ 3: ĐỘNG LỰC HỌC VI MÔ TẠI NÚT GIAO (INTERSECTION & QUEUE DYNAMICS)    │
+│ • Hàng đợi cực đại/trung bình (Max/Avg Queue) • Nguy cơ nghẽn tràn (Spillback) │
+│ • Suất dòng bão hòa xe máy (Saturation Flow S) • Trễ dừng tại nút (Delay)   │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+┌──────────────────────────────────────▼──────────────────────────────────────┐
+│ CẤP ĐỘ 2: ĐỘNG HỌC VẬN TỐC & HÀNH TRÌNH (SPEED & TRAVEL TIME ACCURACY)      │
+│ • RMSE, MAE, MAPE Vận tốc • Hệ số Bất bình đẳng Theil (Theil's U Decomposition)│
+│ • Thời gian hành trình hành lang trọng điểm (Corridor Travel Time / TTI)    │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+┌──────────────────────────────────────▼──────────────────────────────────────┐
+│ CẤP ĐỘ 1: LƯU LƯỢNG & NHU CẦU VĨ MÔ (FLOW & DEMAND ROUTING CALIBRATION)     │
+│ • Thống kê GEH (UK DMRB / FHWA) • Hệ số tương quan R² & Slope               │
+│ • Tỷ lệ chênh lệch nạp mạng (Insertion Completion Rate)                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Thực hiện kiểm định lần lượt theo cấp độ

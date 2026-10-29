@@ -20,6 +20,14 @@ if sys.platform == "win32":
     except Exception:
         pass
 
+# Đảm bảo import config và run_crawler từ 01_ingestion
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_MODULE_ROOT = _SCRIPT_DIR.parent
+_INGESTION_DIR = _MODULE_ROOT / "01_ingestion"
+for p in [_SCRIPT_DIR, _MODULE_ROOT, _INGESTION_DIR]:
+    if str(p) not in sys.path:
+        sys.path.insert(0, str(p))
+
 from config import PROCESSED_DATA_DIR
 from run_crawler import estimate_bpr_volume
 

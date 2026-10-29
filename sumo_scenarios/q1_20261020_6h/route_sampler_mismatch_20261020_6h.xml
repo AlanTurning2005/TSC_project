@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-10-22 22:34:40.297575 by routeSampler.py v1_20_0+0002-343658e7c64
+<configuration>
+    <route-files value="candidate_routes_20261020_6h.rou.xml"/>
+    <edgedata-files value="macro_traffic_crawler/data/processed/edge_counts_20261020_6h.xml"/>
+    <output-file value="calibrated_routes_20261020_6h.rou.xml"/>
+    <mismatch-output value="macro_traffic_crawler/data/processed/route_sampler_mismatch_20261020_6h.xml"/>
+    <verbose value="True"/>
+    <attributes value="type=hcmc_mixed"/>
+    <write-flows value="number"/>
+    <optimize value="full"/>
+    <minimize-vehicles value="0.2"/>
+    <threads value="4"/>
+</configuration>
+-->
+
+<data>
+    <interval id="deficit" begin="0.0" end="22603.0">
+        <edge id="-1157160322#2" measuredCount="29569" deficit="0"/>
+        <edge id="1162414403#1" measuredCount="45719" deficit="0"/>
+        <edge id="-1162554504" measuredCount="22869" deficit="1"/>
+        <edge id="1176155754#1" measuredCount="56905" deficit="0"/>
+        <edge id="803279639" measuredCount="22863" deficit="0"/>
+        <edge id="-1179966753#4" measuredCount="28437" deficit="-1"/>
+        <edge id="1182181717#0" measuredCount="67325" deficit="8135"/>
+        <edge id="1184372243" measuredCount="75706" deficit="0"/>
+        <edge id="-1184372244#1" measuredCount="25239" deficit="1"/>
+        <edge id="1185423294" measuredCount="33926" deficit="0"/>
+        <edge id="1222962346#1" measuredCount="67832" deficit="0"/>
+        <edge id="1222962347#3" measuredCount="103388" deficit="0"/>
+        <edge id="1265822554" measuredCount="58941" deficit="0"/>
+        <edge id="1265822570" measuredCount="67328" deficit="0"/>
+        <edge id="1267006215#0" measuredCount="56161" deficit="1"/>
+        <edge id="1267138238#1" measuredCount="75704" deficit="0"/>
+        <edge id="1267653586#0" measuredCount="61991" deficit="0"/>
+        <edge id="1313420763#2" measuredCount="56128" deficit="0"/>
+        <edge id="1374006570" measuredCount="67275" deficit="59137"/>
+        <edge id="1391882257" measuredCount="58894" deficit="0"/>
+        <edge id="1391882258#1" measuredCount="58855" deficit="0"/>
+        <edge id="1391882256" measuredCount="58881" deficit="0"/>
+        <edge id="1395935224" measuredCount="58845" deficit="1"/>
+        <edge id="1414094279" measuredCount="67248" deficit="0"/>
+        <edge id="-192035998" measuredCount="25133" deficit="0"/>
+        <edge id="193256696#2" measuredCount="74758" deficit="0"/>
+        <edge id="193616433#1" measuredCount="113981" deficit="1"/>
+        <edge id="205311563#1" measuredCount="34554" deficit="1"/>
+        <edge id="326771005#1" measuredCount="75471" deficit="-1"/>
+        <edge id="326771006#2" measuredCount="75024" deficit="1"/>
+        <edge id="326849844#2" measuredCount="56089" deficit="0"/>
+        <edge id="326849845" measuredCount="56057" deficit="1"/>
+        <edge id="326849846#2" measuredCount="61899" deficit="0"/>
+        <edge id="327048052#1" measuredCount="75620" deficit="-1"/>
+        <edge id="327048054#8" measuredCount="56745" deficit="0"/>
+        <edge id="329878183#2" measuredCount="75032" deficit="13726"/>
+        <edge id="329878185#5" measuredCount="48915" deficit="3196"/>
+        <edge id="35112971#2" measuredCount="22829" deficit="-1"/>
+        <edge id="35113721#7" measuredCount="19839" deficit="0"/>
+        <edge id="35114207#6" measuredCount="68493" deficit="1"/>
+        <edge id="35114262#1" measuredCount="88435" deficit="0"/>
+        <edge id="35114553#2" measuredCount="19851" deficit="0"/>
+        <edge id="408246393#4" measuredCount="48776" deficit="1"/>
+        <edge id="408845370" measuredCount="37387" deficit="0"/>
+        <edge id="608262688#1" measuredCount="113943" deficit="1"/>
+        <edge id="654858165#0" measuredCount="84623" deficit="0"/>
+        <edge id="654858471#8" measuredCount="75702" deficit="0"/>
+        <edge id="-654858472#3" measuredCount="28450" deficit="0"/>
+        <edge id="654861070#1" measuredCount="34451" deficit="1"/>
+        <edge id="-658328100#4" measuredCount="19852" deficit="1"/>
+        <edge id="678315474#1" measuredCount="88688" deficit="0"/>
+        <edge id="678315476#0" measuredCount="59090" deficit="1"/>
+        <edge id="686500792#1" measuredCount="29537" deficit="0"/>
+        <edge id="694942823" measuredCount="25228" deficit="1"/>
+        <edge id="694973742#3" measuredCount="19866" deficit="1"/>
+        <edge id="-700026885#4" measuredCount="67935" deficit="0"/>
+        <edge id="716065020#3" measuredCount="73196" deficit="0"/>
+        <edge id="732571882#1" measuredCount="59095" deficit="0"/>
+        <edge id="747226799#0" measuredCount="101189" deficit="42079"/>
+        <edge id="747226800#1" measuredCount="56138" deficit="1"/>
+        <edge id="747231131#2" measuredCount="88649" deficit="0"/>
+        <edge id="749986988#4" measuredCount="75407" deficit="0"/>
+        <edge id="-758852506#2" measuredCount="88706" deficit="1"/>
+        <edge id="-803279638#3" measuredCount="88746" deficit="1"/>
+        <edge id="-803279639" measuredCount="22877" deficit="1"/>
+        <edge id="803279640" measuredCount="59110" deficit="0"/>
+    </interval>
+</data>

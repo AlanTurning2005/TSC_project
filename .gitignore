@@ -23,9 +23,5 @@ sumo_scenarios/**/queue.xml
 *.env
 macro_traffic_crawler/.env
 
-# .gitignore
-.env
-*.pyc
-__pycache__/
-venv/
-
+# Bỏ qua dữ liệu snapshot thô từ crawler (> 1GB)
+macro_traffic_crawler/data/raw/*.json

@@ -24,6 +24,13 @@ if sys.platform == "win32":
     except Exception:
         pass
 
+# Đảm bảo import config và tomtom_client
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_MODULE_ROOT = _SCRIPT_DIR.parent
+for p in [_SCRIPT_DIR, _MODULE_ROOT]:
+    if str(p) not in sys.path:
+        sys.path.insert(0, str(p))
+
 from config import (
     POINTS_FILE,
     RAW_DATA_DIR,

@@ -5,8 +5,15 @@ lam danh sach diem do (sampling points) cho TomTom Traffic Flow API.
 """
 
 import csv
+import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
+
+# Đảm bảo import config từ thư mục gốc macro_traffic_crawler
+_MODULE_ROOT = Path(__file__).resolve().parent.parent
+if str(_MODULE_ROOT) not in sys.path:
+    sys.path.insert(0, str(_MODULE_ROOT))
+
 from config import OSM_MAP_PATH, POINTS_FILE, DEFAULT_BBOX
 
 PRIORITY_HIGHWAYS = {

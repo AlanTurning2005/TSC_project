@@ -26,6 +26,13 @@ if sys.platform == "win32":
     except Exception:
         pass
 
+# Đảm bảo import config, tomtom_client, key_rotator, run_crawler
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_MODULE_ROOT = _SCRIPT_DIR.parent
+for p in [_SCRIPT_DIR, _MODULE_ROOT]:
+    if str(p) not in sys.path:
+        sys.path.insert(0, str(p))
+
 import pandas as pd
 from config import (
     POINTS_FILE,
@@ -83,7 +90,7 @@ def check_schedule_window(now: datetime) -> Tuple[bool, Optional[str], int]:
     seconds_to_wait = int(next_window_time.timestamp() - now_ts)
     return False, None, max(1, seconds_to_wait)
 
-def run_scheduled_crawl_round(client: TomTomTrafficClient, rotator: KeyRotator, points_file: Path, limit: int = None):
+def run_scheduled_crawl_round(client: TomTomTrafficClient, rotator: KeyRotator, points_file: Path, limit: int = None, output_csv: Optional[str] = None, save_raw: bool = False):
     """Thực hiện trọn vẹn 1 vòng cào cho toàn bộ danh sách điểm đo có failover API key."""
     if not points_file.exists():
         print(f"[!] Khong tim thay {points_file}. Vui long chay extract_osm_points.py truoc.")
@@ -179,16 +186,20 @@ def run_scheduled_crawl_round(client: TomTomTrafficClient, rotator: KeyRotator, 
               f"Lanes={lanes}, Speed={flow['current_speed']:.1f}/{flow['free_flow_speed']:.1f} km/h, "
               f"Vol={est_volume:.0f} vph")
 
-    # 1. Lưu RAW JSON Snapshot
-    RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
-    raw_file = RAW_DATA_DIR / f"raw_snapshot_{timestamp_str}.json"
-    with open(raw_file, "w", encoding="utf-8") as f:
-        json.dump(raw_snapshots, f, ensure_ascii=False, indent=2)
+    # 1. Lưu RAW JSON Snapshot (Chỉ khi bật --save-raw để tiết kiệm dung lượng ổ cứng)
+    if save_raw:
+        RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
+        raw_file = RAW_DATA_DIR / f"raw_snapshot_{timestamp_str}.json"
+        with open(raw_file, "w", encoding="utf-8") as f:
+            json.dump(raw_snapshots, f, ensure_ascii=False, indent=2)
 
     # 2. Lưu PROCESSED CSV History
-    PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
-    # processed_file = PROCESSED_DATA_DIR / "macro_traffic_history.csv"
-    processed_file = PROCESSED_DATA_DIR / "macro_traffic_dense_1min.csv"
+    if output_csv:
+        out_p = Path(output_csv)
+        processed_file = (PROCESSED_DATA_DIR / out_p) if len(out_p.parts) == 1 else out_p
+    else:
+        processed_file = PROCESSED_DATA_DIR / "macro_traffic_dense_1min.csv"
+    processed_file.parent.mkdir(parents=True, exist_ok=True)
     df_new = pd.DataFrame(processed_records)
 
     if processed_file.exists() and os.path.getsize(processed_file) > 0:
@@ -211,6 +222,8 @@ def main():
     parser.add_argument("--mock", action="store_true", help="Chay o che do Mock Test voi 5 keys ao")
     parser.add_argument("--interval", type=int, default=CRAWL_INTERVAL_SECONDS, help="Khoang cach giua cac vong trong khung gio (giay)")
     parser.add_argument("--limit", type=int, default=None, help="Gioi han so diem do moi vong")
+    parser.add_argument("--output", "-o", type=str, default=None, help="Duong dan file CSV ket qua (mac dinh: macro_traffic_dense_1min.csv)")
+    parser.add_argument("--save-raw", action="store_true", help="Luu file JSON snapshot tho cua tung vong (mac dinh: False de tranh tran o cung)")
     parser.add_argument("--summary", action="store_true", help="Chi in thong ke quota cac keys roi thoat")
 
     args = parser.parse_args()
@@ -242,7 +255,7 @@ def main():
 
     if args.now:
         print("[*] Che do '--now': Chay kiem tra ngay 1 vong cào...")
-        run_scheduled_crawl_round(client, rotator, POINTS_FILE, limit=args.limit)
+        run_scheduled_crawl_round(client, rotator, POINTS_FILE, limit=args.limit, output_csv=args.output, save_raw=args.save_raw)
         rotator.print_summary()
         return
 
@@ -258,7 +271,7 @@ def main():
 
             if in_window:
                 print(f"\n[DANG TRONG KHUNG GIO] >>> {window_name} ({now.strftime('%H:%M:%S')}) <<<")
-                success = run_scheduled_crawl_round(client, rotator, POINTS_FILE, limit=args.limit)
+                success = run_scheduled_crawl_round(client, rotator, POINTS_FILE, limit=args.limit, output_csv=args.output, save_raw=args.save_raw)
                 
                 if not success:
                     # Nếu hết toàn bộ keys, ngủ đến 07:05 sáng mai để chờ reset

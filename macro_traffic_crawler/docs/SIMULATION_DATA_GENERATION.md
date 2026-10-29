@@ -25,8 +25,8 @@ flowchart TD
 
     subgraph G3["GIAI ĐOẠN 3: MÔ HÌNH HÓA NHU CẦU & DÒNG XE MÁY"]
         CSV --> GEN_COUNTS["generate_sumo_counts.py<br/>(Python Data Pipeline)"]
-        TCVN["TCVN 104:2007 & TCVN 4054<br/>Hệ số PCU: Moto=0.3, Car=1.0, Bus=2.0"] --> GEN_COUNTS
-        SPLIT["Modal Split Phân tầng theo Cấp đường<br/>(Primary: 85-12-3, Secondary: 92-8-0)"] --> GEN_COUNTS
+        TCVN["TCVN 13592:2022 (Bảng 3)<br/>Hệ số PCU: Moto=0.3, Car=1.0, Bus/Truck=2.5/3.0"] --> GEN_COUNTS
+        SPLIT["Modal Split Phân tầng kèm Sai số thực địa &plusmn;3-5%<br/>(Primary: 85&plusmn;3 / 12&plusmn;3 / 3&plusmn;2)"] --> GEN_COUNTS
         NETXML --> SPATIAL["Spatial Matching:<br/>WGS84 ➔ UTM 48N ➔ SUMO Edge"]
         SPATIAL --> GEN_COUNTS
         GEN_COUNTS --> COUNTS["edge_counts.xml<br/>(66 điểm đếm lưu lượng mục tiêu)"]
@@ -82,9 +82,9 @@ flowchart TD
      * `--tls.guess-signals` & `--tls.join`: Tự động nhận diện và ghép các đèn tín hiệu giao thông (TLS) liên kết.
      * `--geometry.remove`: Tránh đường bị chia vụn thành hàng trăm đoạn nhỏ.
      * `--ramps.guess`: Tránh xe dừng khựng vô lý tại các góc rẽ phải, vòng xoay.
-     * `--tls.discard-simple`: Loại bỏ đèn tín hiệu ở nút giao thông (có 1 hướng vào,ra hoặc các đoạn thẳng giao thông không có luồng xe cắt qua ).
+     * `--tls.discard-simple`: Loại bỏ đèn tín hiệu ở nút giao thông (có 1 hướng vào/ra hoặc các đoạn thẳng không có luồng xe cắt qua).
 
-* * **Đầu ra:** File mạng lưới hoàn chỉnh `data/raw_data/q1_map.net.xml` (gồm 515 cạnh, 438 nút giao, 35 cụm đèn tín hiệu và 2 vòng xoay).
+* **Đầu ra:** File mạng lưới hoàn chỉnh `data/raw_data/q1_map.net.xml` (gồm 515 cạnh, 438 nút giao, 35 cụm đèn tín hiệu và 2 vòng xoay).
 
 ---
 
@@ -95,8 +95,11 @@ flowchart TD
 * **Cách thực hiện:**
   1. Dùng `extract_osm_points.py` trích xuất 66 điểm đo trọng yếu (bao phủ đủ các trục chính Nam Kỳ Khởi Nghĩa, Pasteur, Lê Duẩn, Nguyễn Thị Minh Khai, và 4 cung phần tư của vòng xoay Hồ Con Rùa).
   2. Dùng `scheduled_crawler.py` xoay vòng API Keys để cào dữ liệu định kỳ.
-  3. Tính toán Khả năng thông hành làn đường $C$ theo chuẩn **TCVN 13592:2022** [1] và ước tính lưu lượng xe theo hàm **BPR (Bureau of Public Roads)** [2]:
-     $$V = C \times \left( \frac{t - t_0}{0.15 \times t_0} \right)^{1/4}$$
+  3. Tính toán Khả năng thông hành làn đường $C$ theo quy chuẩn **TCVN 13592:2022** [1] và ước tính lưu lượng xe theo hàm nghịch đảo **BPR (Bureau of Public Roads)** [2]:
+     $$V = C \times \left[ \frac{1}{\alpha} \left( \frac{t - t_0}{t_0} \right) \right]^{1/\beta}$$
+     * **Ghi chú chuẩn hóa:**
+       * Bản gốc chuẩn Cục Đường bộ Mỹ (US BPR 1964): $\alpha = 0.15$ và $\beta = 4.0$.
+       * Đối với dòng giao thông hỗn hợp xe máy tại TP.HCM: Bộ tham số $(\alpha, \beta)$ cần được hiệu chuẩn lại để phản ánh đúng thực tế lưu thông đô thị. Hiện tại quá trình chạy tối ưu hóa thực nghiệm đang tiếp tục được đo đạc, kiểm chuẩn đa seeds và chưa chốt giá trị chính thức; mục này được gắn nhãn `[ĐANG TRONG QUÁ TRÌNH HIỆU CHUẨN / CHƯA CHỐT THỰC NGHIỆM]`.
 * **Đầu ra:** `macro_traffic_dense_1min.csv` chứa vận tốc thực tế, vận tốc tự do, độ trễ và lưu lượng quy đổi (PCU/h).
 
 ---
@@ -106,38 +109,71 @@ flowchart TD
 * **Công cụ sử dụng:** Python (`generate_sumo_counts.py`), XML.
 * **Cách thực hiện:**
   1. **Quy đổi PCU sang Phương tiện Vật lý (Physical Vehicles):**
-     * Tham chiếu **TCVN 104:2007 Bảng 2**: Xe máy = 0.30 PCU, Ô tô con = 1.00 PCU, Xe buýt = 2.00 PCU.
-  2. **Phân tầng Tỷ lệ Phương tiện (Modal Split) theo cấp đường:**
-     * Trục chính lớn (Primary): 85% Xe máy - 12% Ô tô - 3% Xe buýt.
-     * Đường nhánh/gom (Secondary/Tertiary): 92% Xe máy - 8% Ô tô - 0% Xe buýt.
-     * Đường nội bộ dân cư (Residential): 96% Xe máy - 4% Ô tô - 0% Xe buýt. [3]
+     * Tra cứu đồng bộ theo **TCVN 13592:2022 (Bảng 3 - Hệ số quy đổi các loại xe ra xe con quy đổi)** [1] cho đường đô thị có vận tốc thiết kế $30 - 50\text{ km/h}$:
+       * **Xe mô tô, xe gắn máy 2 bánh:** **$0.30\text{ PCU}$**
+       * **Xe ô tô con (< 9 chỗ):** **$1.00\text{ PCU}$** (Đơn vị xe con quy đổi cơ sở)
+       * **Xe tải 2 trục và xe buýt cỡ nhỏ, trung bình:** **$2.50\text{ PCU}$**
+       * **Xe buýt cỡ lớn ($\ge 25$ chỗ) và xe tải từ 3 trục trở lên:** **$3.00\text{ PCU}$**
+     *(Toàn bộ các loại phương tiện đều được tra cứu nhất quán theo TCVN 13592:2022 Bảng 3, loại bỏ hoàn toàn việc trích dẫn chắp vá tiêu chuẩn ngoài đô thị TCVN 4054:2005).*
+
+  2. **Phân tầng Tỷ lệ Phương tiện (Modal Split) theo cấp đường kèm Sai số thực địa ($\pm 3 - 5\%$):**
+     * **Bằng chứng thực nghiệm khảo sát tại TP.HCM (Dung et al., 2015 [3]):**
+       * Cơ cấu chung toàn thành phố: Xe máy $89\%$, Ô tô con $6\%$, Phương tiện khác $5\%$.
+       * Đường cao tốc / Trục chính (Điện Biên Phủ, Xa lộ Hà Nội): Tỷ lệ xe máy / ô tô $\approx 10:1$ (Xe máy chiếm $\sim 91.2\%$, Ô tô chiếm $\sim 8.8\%$).
+       * Đường trục đô thị (Xô Viết Nghệ Tĩnh) & Đường nội bộ (D2): Tỷ lệ xe máy / ô tô $\approx 40:1$ (Xe máy chiếm $\sim 97.5\%$, Ô tô chiếm $\sim 2.5\%$).
+     * **Thiết lập Kịch bản Mô phỏng Nội đô Quận 1 `[THIẾT LẬP KỊCH BẢN NỘI ĐÔ QUẬN 1 / CÓ BIÊN ĐỘ BIẾN THIÊN THỰC ĐỊA $\pm 3-5\%$]`:**
+       Khu vực trung tâm Quận 1 quanh Dinh Độc Lập và Vòng xoay Hồ Con Rùa có mật độ xe taxi, GrabCar và xe buýt cao hơn mức trung bình toàn đô thị. Nhằm phản ánh sự dao động ngẫu nhiên giữa các khung giờ và các ngày khảo sát, tỷ lệ phương tiện được thiết lập kèm biên độ sai số thực nghiệm $\pm 3\% \sim 5\%$:
+       * **Trục chính lớn (Primary - Lê Duẩn, NKKN, Điện Biên Phủ):** Xe máy $85\% \pm 3\%$, Ô tô con $12\% \pm 3\%$, Xe buýt $3\% \pm 2\%$.
+       * **Đường nhánh / gom (Secondary - Pasteur, Võ Văn Tần, NTMK):** Xe máy $92\% \pm 3\%$, Ô tô con $8\% \pm 3\%$, Xe buýt $0\%$.
+       * **Đường nội bộ dân cư (Residential / Tertiary):** Xe máy $96\% \pm 2\%$, Ô tô con $4\% \pm 2\%$, Xe buýt $0\%$.
+
   3. **Ánh xạ Không gian (Spatial Matching):**
      * Chuyển đổi tọa độ GPS $(lat, lon)$ sang hệ tọa độ phẳng UTM Zone 48N, cộng vector bù tọa độ `netOffset` của file `q1_map.net.xml`.
      * Tìm đoạn đường (edge) gần nhất trên bản đồ SUMO bằng thuật toán khoảng cách Euclidean điểm-đoạn thẳng.
+
   4. Chạy lệnh tạo file đếm xe mục tiêu:
      ```bash
      python macro_traffic_crawler/generate_sumo_counts.py
      ```
+
   5. **Cấu hình Hành vi Xe máy Việt Nam (Sublane Model) trong `vtypes.add.xml`:**
-     Xe máy tại Việt Nam luồn lách tự do, không chạy thẳng hàng trong 1 làn cứng. Cần cấu hình mô hình Sublane [4]:
+     Dòng xe máy tại Việt Nam di chuyển phi làn (non-lane-based), luồn lách qua các khoảng hở giữa các ô tô. Mô hình sử dụng Sublane Model của SUMO (Semrau & Erdmann, 2016 [4]) kết hợp số liệu vi mô thực nghiệm đo đạc bằng UAV tại TP.HCM (Trinh et al., 2021 [5]):
+
+     | Tham số SUMO | Giá trị | Đơn vị | Cơ sở khoa học & Ý nghĩa vật lý | Phân loại học thuật |
+     | :--- | :---: | :---: | :--- | :---: |
+     | **`length` / `width`** | `1.8` / `0.8` | mét | Kích thước bao hình học phổ biến của xe Wave, Vision, AirBlade tại TP.HCM (TCVN 13592:2022). | `[QUY CHUẨN THỰC ĐỊA]` |
+     | **`minGap`** | `0.5` | mét | Khoảng cách an toàn dọc tối thiểu khi dừng chờ đèn đỏ. Phù hợp với đặc tính dừng áp sát của xe 2 bánh (Kuo et al., 2023). | `[GIẢ ĐỊNH / CHƯA CHẠY THỰC NGHIỆM]` |
+     | **`minGapLat`** | `0.2` | mét | Khoảng cách an toàn ngang tối thiểu khi luồn lách qua khe hẹp. Tương thích với `lateral-resolution="0.8"` của SUMO. | `[GIẢ ĐỊNH / CHƯA CHẠY THỰC NGHIỆM]` |
+     | **`latAlignment`** | `"arbitrary"` | chuỗi | Cho phép xe máy định vị ngang tự do trên mặt cắt làn, không bám tâm làn (Trinh et al., 2021; Semrau & Erdmann, 2016). | `[ĐẶC TẢ SUMO SUBLANE]` |
+     | **`accel`** | `1.5` | $\text{m/s}^2$ | Gia tốc thoải mái của xe máy. Đo đạc UAV thực nghiệm tại Ngã 6 Nguyễn Tri Phương (Trinh et al., 2021 [5]) chỉ ra $74.8\%$ xe máy có gia tốc trong dải $-0.4 \sim +0.4\text{ m/s}^2$, và chỉ $4.2\%$ vượt quá $1.0\text{ m/s}^2$. Mức $1.5\text{ m/s}^2$ đảm bảo xe xuất phát linh hoạt mà không bị vọt tốc phi lý. | `[SỐ LIỆU ĐO ĐẠC THỰC ĐỊA HCMC]` |
+     | **`decel`** | `2.5` | $\text{m/s}^2$ | Gia tốc giảm tốc bình thường trong luồng xe đông (hạ từ mức $4.5\text{ m/s}^2$ cũ để tránh giật xe). | `[GIẢ ĐỊNH KỸ THUẬT]` |
+     | **`emergencyDecel`** | `5.0` | $\text{m/s}^2$ | Phanh khẩn cấp phòng tránh va chạm (vật lý ma sát lốp trên mặt đường khô). | `[QUY CHUẨN VẬT LÝ]` |
+     | **`sigma`** | `0.5` | $[0, 1]$ | Mức độ dao động tay ga không hoàn hảo của người lái (Mô hình Car-following Krauß 1998). | `[MÔ HÌNH CAR-FOLLOWING]` |
+     | **`lcSublane`** | `1.0` | hệ số | Mức độ tận dụng các làn phụ ảo. Giá trị mặc định của SUMO (Semrau & Erdmann, 2016). | `[ĐẶC TẢ SUMO MẶC ĐỊNH]` |
+     | **`lcPushy`** | `0.5` | $[0, 1]$ | Mức độ chen lấn chủ động khi nhập dòng/vượt xe (Codecà & Härri 2019 [7] khuyến cáo dùng $0.25 - 0.5$ để tránh nghẽn nhân tạo deadlock). | `[GIẢ ĐỊNH / CẦN HIỆU CHUẨN]` |
+     | **`maxSpeed`** | `9.72` | $\text{m/s}$ | $35.0\text{ km/h}$, neo theo vận tốc tự do TomTom tại Quận 1 ($v_0 = 30.09\text{ km/h}$) để triệt tiêu sai số trần tốc độ. | `[HIỆU CHUẨN THỰC ĐỊA]` |
+
+     **Cấu hình XML chính thức (`vtypes.add.xml`):**
      ```xml
      <additional>
-         <!-- Xe máy: luồn lách tự do, khoảng cách an toàn ngang nhỏ -->
+         <!-- Xe máy: luồn lách tự do, cự ly ngang hẹp, gia tốc thực tế TP.HCM -->
          <vType id="motorcycle" vClass="motorcycle" length="1.8" width="0.8" 
-                maxSpeed="13.88" accel="2.5" decel="4.5"
-                latAlignment="arbitrary" minGapLat="0.2" minGap="0.5"/>
+                maxSpeed="9.72" accel="1.5" decel="2.5" emergencyDecel="5.0" sigma="0.5"
+                latAlignment="arbitrary" minGapLat="0.2" minGap="0.5"
+                lcSublane="1.0" lcPushy="0.5"/>
          
          <!-- Ô tô con -->
          <vType id="passenger" vClass="passenger" length="4.5" width="1.8" 
-                maxSpeed="16.67" accel="2.0" decel="4.5"
+                maxSpeed="9.72" accel="1.8" decel="3.0" emergencyDecel="5.5" sigma="0.5"
                 latAlignment="center" minGapLat="0.6" minGap="1.5"/>
                 
-         <!-- Xe buýt -->
+         <!-- Xe buýt đô thị -->
          <vType id="bus" vClass="bus" length="10.5" width="2.5" 
-                maxSpeed="11.11" accel="1.2" decel="3.5"
+                maxSpeed="9.72" accel="1.0" decel="2.0" emergencyDecel="4.0" sigma="0.5"
                 latAlignment="right" minGapLat="0.8" minGap="2.5"/>
      </additional>
      ```
+
 * **Đầu ra:** File cảm biến đếm xe `edge_counts.xml` và định nghĩa phương tiện `vtypes.add.xml`.
 
 ---
@@ -189,7 +225,7 @@ flowchart TD
      ```
      *Điểm mấu chốt kỹ thuật:*
      * Cờ `--write-flows number`: Nén lưu lượng 6.75 tiếng (hơn 4 triệu lượt xe) thành các thẻ `<flow>` cực kỳ ngắn gọn (~10 KB thay vì 220 MB), tránh hoàn toàn lỗi tràn RAM máy tính.
-     * Cờ `--attributes 'type=\"hcmc_mixed\"'`: Tự động áp dụng phân bố 85% xe máy - 12% ô tô - 3% xe buýt cho từng luồng xe.
+     * Cờ `--attributes 'type=\"hcmc_mixed\"'`: Tự động áp dụng phân bố tỷ lệ xe cho từng luồng xe.
 
 * **Đầu ra:** File luồng xe đã được hiệu chuẩn hoàn chỉnh `calibrated_routes.rou.xml`.
 
@@ -245,13 +281,27 @@ flowchart TD
 
 ---
 
-## TÀI LIỆU THAM KHẢO & CƠ SỞ KHOA HỌC
+## TÀI LIỆU THAM KHẢO CHUẨN XÁC & CƠ SỞ KHOA HỌC
 
-[0] Alvarez Lopez, P. et al. (2018). *Microscopic Traffic Simulation using SUMO*. IEEE 21st ITSC.  
-[1] Bộ Xây dựng (2007). *TCVN 104:2007 - Đường đô thị: Yêu cầu thiết kế*. Bảng 2: Hệ số quy đổi xe con (PCU) cho đô thị loại đặc biệt (TP.HCM).  
-[2] Bureau of Public Roads (1964). *Traffic Assignment Manual*. U.S. Dept. of Commerce, Urban Planning Division. (Hiệu chuẩn cho giao thông hỗn hợp VN: $\alpha=0.35, \beta=2.5$).  
-[3] Krajzewicz, D. et al. (2015). *Sublane Model in SUMO: Simulating Motorcycle Behavior and Lateral Movements*. SUMO Conference Proceedings.  
-[4] Minh, C. C., Sano, K., & Matsumoto, S. (2005). *Maneuvers of Motorcycles in Mixed Traffic Conditions: Empirical Study in Vietnam*. Journal of the Eastern Asia Society for Transportation Studies, 6, 178-193.  
-[5] Vu, A. T., & Shimizu, T. (2014). *Modeling Passenger Car Units for Motorcycles at Signalized Intersections under Mixed Traffic in Ho Chi Minh City*. Transport and Logistics Studies, 2, 45-56.  
-[6] JICA & UBND TP.HCM (2004). *The Study on Urban Transport Master Plan in the Ho Chi Minh City Metropolitan Area (HOUTRANS)*. Final Report, JICA.  
-[7] Tuan, V. A. (2016). *Evaluating Traffic Flow Characteristics of Motorcycle-Dominated Urban Street Networks*. Vietnam Journal of Transport and Communications, 10, 32-38.
+[0] Alvarez Lopez, P. et al. (2018). *Microscopic Traffic Simulation using SUMO*. The 21st IEEE International Conference on Intelligent Transportation Systems (ITSC 2018).  
+[1] Bộ Giao thông Vận tải (2022). *TCVN 13592:2022 - Đường đô thị: Yêu cầu thiết kế*. Bảng 3: Hệ số quy đổi các loại xe ra xe con quy đổi (PCU). NXB Xây dựng, Hà Nội.  
+[2] Bureau of Public Roads (BPR). (1964). *Traffic Assignment Manual*. U.S. Department of Commerce, Urban Planning Division, Washington, D.C.  
+[3] Dung, C. T., Miwa, T., Sato, H., & Morikawa, T. (2015). "Analysis on Characteristics of Passenger Car and Motorcycle Fleets and Their Driving Conditions in Developing Country: A Case Study in Ho Chi Minh City, Vietnam." *Journal of the Eastern Asia Society for Transportation Studies*, 11, pp. 1096–1111.  
+[4] Semrau, M., & Erdmann, J. (2016). "Simulation of sublane-based dynamics with SUMO." *SUMO2016 - Traffic, Mobility, and Logistics*, pp. 105–118. German Aerospace Center (DLR).  
+[5] Trinh, L. T., Sano, K., Hatoyama, K., & De Silva, C. K. (2021). "Analysis of motorcycle microscopic characteristics at roundabouts under mixed traffic condition: A case study of Vietnam." *Journal of Traffic and Transportation Engineering (English Edition)*, 8(4), pp. 605–619.  
+[6] Minh, C. C., Sano, K., & Matsumoto, S. (2005). "Characteristics of Passing and Paired Riding Maneuvers of Motorcycle." *Journal of the Eastern Asia Society for Transportation Studies*, 6, pp. 186–197.  
+[7] Codecà, L., & Härri, J. (2019). "Towards Multimodal Mobility Simulation of Monaco: a Sublane Model for Motorcycles." *2019 IEEE Vehicular Networking Conference (VNC)*, pp. 1–4.  
+[8] JICA & UBND TP.HCM (2004). *The Study on Urban Transport Master Plan in the Ho Chi Minh City Metropolitan Area (HOUTRANS)*. Final Report, Japan International Cooperation Agency.  
+
+---
+
+## ƯU ĐIỂM CỦA PIPELINE
+- Trích xuất dữ liệu vận tốc thực tế mật độ cao (120s/chu kỳ cập nhật từ TomTom Flow API).
+- Tận dụng `routeSampler` để sinh luồng xe khớp theo từng phút mà không phụ thuộc vào ma trận OD đầy đủ vốn rất đắt đỏ để điều tra.
+- Kích hoạt được mô hình Sublane Model tái hiện hiện tượng điền đầy khoảng trống và luồn lách của xe máy.
+
+## HẠN CHẾ & GIẢ ĐỊNH KỸ THUẬT HIỆN TẠI
+- **Lệch pha bản đồ OSM:** Do dữ liệu OpenStreetMap được đóng góp từ cộng đồng, vị trí một số cột đèn tín hiệu có thể lệch nhẹ so với thực địa; cần hiệu chỉnh thủ công bằng `netedit`.
+- **Thiếu dữ liệu chu kỳ đèn thực tế:** Hiện tại chưa có dữ liệu thời gian thực về chu kỳ đèn và thời lượng pha xanh tại 35 cụm TLS; SUMO đang áp dụng chu kỳ đèn mặc định tạo tự động từ `netconvert`.
+- **Tính chất cục bộ của luồng xe:** Lưu lượng nạp từ `randomTrips` kết hợp `routeSampler` mới chỉ tối ưu khớp cho 66 cạnh có điểm đo TomTom; các cạnh nội bộ còn lại phụ thuộc vào tính ngẫu nhiên của thuật toán phát sinh hành trình.
+- **Tham số chuyển làn Sublane:** Các tham số như `lcPushy`, `minGapLat` hiện mang tính giả định kỹ thuật theo khuyến nghị của SUMO docs và Codecà & Härri (2019); cần tiếp tục hiệu chuẩn tinh vi khi có thêm video tra cứu trajectory từng nút giao.

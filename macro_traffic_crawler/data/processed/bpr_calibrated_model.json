@@ -1,0 +1,23 @@
+{
+  "model_name": "Calibrated_BPR_HCMC_District1",
+  "calibration_method": "Bayesian_Optimization_TPE",
+  "optimal_parameters": {
+    "alpha": 0.4313287621098984,
+    "beta": 1.439331757686186
+  },
+  "training_metrics": {
+    "best_rmse_kmh": 13.51,
+    "eval_duration_seconds": 600,
+    "step_length_seconds": 1.0,
+    "n_trials": 30,
+    "total_optimization_minutes": 28.61,
+    "train_dataset": "data_hcmc_20_10.csv",
+    "train_time_window": "11:00 -> 16:00"
+  },
+  "network_specification": {
+    "network_file": "q1_map.net.xml",
+    "lateral_resolution_meters": 0.8,
+    "capacity_standard": "TCVN 104:2007 (Table 10)"
+  },
+  "timestamp": "2026-10-22T15:17:36.035304"
+}

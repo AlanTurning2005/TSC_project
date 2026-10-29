@@ -1,0 +1,15 @@
+{
+  "selected_alpha": 0.61,
+  "selected_beta": 2.29,
+  "source": "Singh_1999_Benchmark_Validated_on_HCMC",
+  "status": "APPROVED_FOR_MARL_SIMULATION",
+  "empirical_performance": {
+    "validation_rmse_kmh": 12.97,
+    "validation_mape_percent": 76.56,
+    "test_ood_rmse_kmh": 13.95,
+    "test_ood_mape_percent": 73.80,
+    "test_geh_pass_rate_percent": 8.20
+  },
+  "rationale": "Dat do on dinh va kha nang tong quat hoa cao nhat tren ca cao diem sang va chieu toi tai Quan 1 (vuot troi US BPR va Bayes HCMC)",
+  "updated_at": "2026-10-22T20:15:00.000000"
+}

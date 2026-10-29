@@ -1,0 +1,29 @@
+{
+    "scenario": "Kịch bản Quận 1 (20/10)",
+    "metrics": {
+        "n_evaluated_edges": 66,
+        "n_geh_under_5": 0,
+        "pct_geh_under_5": 0.0,
+        "n_geh_5_to_10": 0,
+        "pct_geh_5_to_10": 0.0,
+        "n_geh_over_10": 66,
+        "pct_geh_over_10": 100.0,
+        "geh_mean": 125.05,
+        "geh_max": 182.82,
+        "geh_median": 132.9,
+        "slope_s": 0.034,
+        "r2_score": -5.227,
+        "pearson_corr": 0.32,
+        "fhwa_geh_passed": false,
+        "wisdot_r2_passed": false,
+        "fhwa_slope_passed": false
+    },
+    "summary_simulation": {
+        "status": "NOT_AVAILABLE",
+        "message": "Chưa có tệp summary-output (cần bật thẻ <summary-output> trong .sumocfg)",
+        "icr_percent": null,
+        "gbr_percent": null,
+        "tcr_percent": null,
+        "teleported_vehicles": null
+    }
+}

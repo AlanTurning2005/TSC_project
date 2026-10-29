@@ -30,14 +30,19 @@ DEFAULT_BBOX = {
 }
 
 # Cấu hình đường dẫn lưu trữ dữ liệu
+MODULE_ROOT = BASE_DIR
+PROJECT_ROOT = BASE_DIR.parent
 DATA_DIR = BASE_DIR / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
-POINTS_FILE = DATA_DIR / "sampling_points.csv"
-STATE_FILE = DATA_DIR / "crawler_state.json"
+METADATA_DIR = DATA_DIR / "metadata"
+
+# Tệp metadata danh sách điểm đo & trạng thái crawler (ưu tiên thư mục metadata/)
+POINTS_FILE = METADATA_DIR / "sampling_points.csv" if (METADATA_DIR / "sampling_points.csv").exists() else DATA_DIR / "sampling_points.csv"
+STATE_FILE = METADATA_DIR / "crawler_state.json" if (METADATA_DIR / "crawler_state.json").exists() else DATA_DIR / "crawler_state.json"
 
 # Đường dẫn tham chiếu đến dữ liệu mạng lưới hiện có trong dự án
-NETWORK_XML_PATH = BASE_DIR.parent / "data" / "raw_data" / "q1_map.net.xml"
+NETWORK_XML_PATH = PROJECT_ROOT / "data" / "raw_data" / "q1_map.net.xml"
 OSM_MAP_PATH = RAW_DATA_DIR / "q1_map.osm"
 
 # Cấu hình crawl
