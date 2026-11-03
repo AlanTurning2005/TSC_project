@@ -1,0 +1,97 @@
+{
+    "evaluation_name": "Level 1 Macro Flow Evaluation",
+    "test_date": "2026-11-01",
+    "num_evaluated_points": 64,
+    "scientific_validity": {
+        "status": "FAIL_WORSE_THAN_FREEFLOW",
+        "message": "Mô phỏng kém hơn giả định đường vắng tanh. Không nắm bắt được ùn tắc.",
+        "sumo_rmse": 15.325,
+        "benchmarks": {
+            "freeflow_rmse": 10.768,
+            "historical_median_rmse": 3.876,
+            "theoretical_noise_floor": 3.732
+        },
+        "acceptable_zone_range": [
+            3.732,
+            5.277
+        ]
+    },
+    "pillar1_speed_errors": {
+        "rmse": 15.325,
+        "rmse_kmh": 15.325,
+        "mae": 13.722,
+        "mae_kmh": 13.722,
+        "mean_error_bias_kmh": 8.509,
+        "bias": 8.509,
+        "smape_percent": 60.51,
+        "mre_percent": 48.16,
+        "mre": 48.16
+    },
+    "pillar2_rank_correlation": {
+        "spearman_rho": 0.1255,
+        "spearman_pvalue": 0.32297,
+        "kendall_tau": 0.0889,
+        "kendall_pvalue": 0.29968
+    },
+    "pillar3_distribution_divergence": {
+        "wasserstein_w1_kmh": 12.234,
+        "wasserstein_w1": 12.234,
+        "ks_statistic": 0.5938,
+        "ks_statistic_d": 0.5938,
+        "ks_pvalue": 8.3046e-11
+    },
+    "pillar4_los_regimes": {
+        "accuracy": 0.1719,
+        "macro_f1": 0.1063,
+        "macro_precision": 0.0705,
+        "macro_recall": 0.2157,
+        "cohen_kappa": -0.1577,
+        "matrix_array": [
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                6,
+                0,
+                41
+            ],
+            [
+                0,
+                6,
+                11
+            ]
+        ],
+        "matrix_dict": {
+            "true_C_pred_C": 0,
+            "true_C_pred_S": 0,
+            "true_C_pred_F": 0,
+            "true_S_pred_C": 6,
+            "true_S_pred_S": 0,
+            "true_S_pred_F": 41,
+            "true_F_pred_C": 0,
+            "true_F_pred_S": 6,
+            "true_F_pred_F": 11
+        },
+        "labels": [
+            "C (Kẹt xe)",
+            "S (Ùn ứ)",
+            "F (Thông thoáng)"
+        ]
+    },
+    "spatial_cluster_bootstrap": {
+        "cluster_col": "road_name",
+        "n_clusters": 22,
+        "n_bootstrap": 1000,
+        "original_metric": 16.6943,
+        "bootstrap_mean": 16.699,
+        "bootstrap_se": 1.326,
+        "bootstrap_bias": 0.0047,
+        "ci_lower": 14.0041,
+        "ci_upper": 19.1105,
+        "confidence_level": 95.0,
+        "ci_formatted": "[14.004, 19.110]",
+        "academic_report": "16.694 (95% Cluster Boot CI: [14.004, 19.110], M=22 corridors)"
+    }
+}

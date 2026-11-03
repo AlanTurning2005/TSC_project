@@ -1,0 +1,152 @@
+[
+    {
+        "rate": 1.8,
+        "hourly_flow_vehh": 6480,
+        "sim_time_s": 799.2924449443817,
+        "expected_inserted_vehs": 12960,
+        "completed_vehs": 11776,
+        "completion_rate_pct": 90.86,
+        "metrics": {
+            "matched_points": 64,
+            "mean_v_obs_kmh": 13.887600806451612,
+            "median_v_obs_kmh": 10.032258064516128,
+            "mean_v_sim_kmh": 23.784375,
+            "median_v_sim_kmh": 21.815,
+            "rmse_kmh": 14.959347055955707,
+            "mae_kmh": 13.115,
+            "bias_kmh": 9.896774193548387,
+            "mre_pct": 48.04377738027082,
+            "spearman_rank_corr": -0.05540343666544124,
+            "wasserstein_w1_kmh": 9.979929435483871
+        },
+        "trips": {
+            "total_completed_trips": 13310,
+            "post_warmup_completed_trips": 11776,
+            "mean_duration_s": 244.59514266304348,
+            "mean_time_loss_s": 103.48179432744566,
+            "mean_waiting_time_s": 66.09611073369565,
+            "mean_trip_speed_kmh": 20.847448714980317,
+            "mean_route_length_m": 1351.9378931725544
+        }
+    },
+    {
+        "rate": 2.2,
+        "hourly_flow_vehh": 7920,
+        "sim_time_s": 1166.403323173523,
+        "expected_inserted_vehs": 15840,
+        "completed_vehs": 14364,
+        "completion_rate_pct": 90.68,
+        "metrics": {
+            "matched_points": 64,
+            "mean_v_obs_kmh": 13.887600806451612,
+            "median_v_obs_kmh": 10.032258064516128,
+            "mean_v_sim_kmh": 22.90328125,
+            "median_v_sim_kmh": 21.245,
+            "rmse_kmh": 14.560578838933735,
+            "mae_kmh": 12.859470766129032,
+            "bias_kmh": 9.015680443548387,
+            "mre_pct": 46.71464920950129,
+            "spearman_rank_corr": -0.04505559861266495,
+            "wasserstein_w1_kmh": 9.201960685483868
+        },
+        "trips": {
+            "total_completed_trips": 16238,
+            "post_warmup_completed_trips": 14364,
+            "mean_duration_s": 266.7829434697856,
+            "mean_time_loss_s": 125.58900654413812,
+            "mean_waiting_time_s": 81.07325257588415,
+            "mean_trip_speed_kmh": 19.780034856204434,
+            "mean_route_length_m": 1352.683418964077
+        }
+    },
+    {
+        "rate": 2.6,
+        "hourly_flow_vehh": 9360,
+        "sim_time_s": 1758.3586151599884,
+        "expected_inserted_vehs": 18720,
+        "completed_vehs": 16361,
+        "completion_rate_pct": 87.4,
+        "metrics": {
+            "matched_points": 64,
+            "mean_v_obs_kmh": 13.887600806451612,
+            "median_v_obs_kmh": 10.032258064516128,
+            "mean_v_sim_kmh": 20.30953125,
+            "median_v_sim_kmh": 19.71,
+            "rmse_kmh": 13.535288923616394,
+            "mae_kmh": 11.713452620967743,
+            "bias_kmh": 6.421930443548387,
+            "mre_pct": 41.41152809286939,
+            "spearman_rank_corr": 0.1600816691419144,
+            "wasserstein_w1_kmh": 7.256386088709677
+        },
+        "trips": {
+            "total_completed_trips": 18560,
+            "post_warmup_completed_trips": 16361,
+            "mean_duration_s": 358.122889798912,
+            "mean_time_loss_s": 216.73240083124503,
+            "mean_waiting_time_s": 140.39288552044496,
+            "mean_trip_speed_kmh": 17.369009875527208,
+            "mean_route_length_m": 1345.1669329503088
+        }
+    },
+    {
+        "rate": 3.0,
+        "hourly_flow_vehh": 10800,
+        "sim_time_s": 8092.724071264267,
+        "expected_inserted_vehs": 21600,
+        "completed_vehs": 18293,
+        "completion_rate_pct": 84.69,
+        "metrics": {
+            "matched_points": 64,
+            "mean_v_obs_kmh": 13.887600806451612,
+            "median_v_obs_kmh": 10.032258064516128,
+            "mean_v_sim_kmh": 18.63328125,
+            "median_v_sim_kmh": 18.41,
+            "rmse_kmh": 13.141204780401608,
+            "mae_kmh": 11.231194556451612,
+            "bias_kmh": 4.7456804435483875,
+            "mre_pct": 39.21937150349512,
+            "spearman_rank_corr": 0.28355692860351145,
+            "wasserstein_w1_kmh": 6.275025201612904
+        },
+        "trips": {
+            "total_completed_trips": 20827,
+            "post_warmup_completed_trips": 18293,
+            "mean_duration_s": 432.212594981687,
+            "mean_time_loss_s": 290.52222817471164,
+            "mean_waiting_time_s": 194.05558410320887,
+            "mean_trip_speed_kmh": 16.03876796223415,
+            "mean_route_length_m": 1343.4198895752475
+        }
+    },
+    {
+        "rate": 3.4,
+        "hourly_flow_vehh": 12240,
+        "sim_time_s": 8939.366737127304,
+        "expected_inserted_vehs": 24480,
+        "completed_vehs": 19464,
+        "completion_rate_pct": 79.51,
+        "metrics": {
+            "matched_points": 64,
+            "mean_v_obs_kmh": 13.887600806451612,
+            "median_v_obs_kmh": 10.032258064516128,
+            "mean_v_sim_kmh": 16.869218749999998,
+            "median_v_sim_kmh": 16.835,
+            "rmse_kmh": 13.821857860414953,
+            "mae_kmh": 11.77655745967742,
+            "bias_kmh": 2.981617943548387,
+            "mre_pct": 39.92644835266794,
+            "spearman_rank_corr": 0.2178527570762935,
+            "wasserstein_w1_kmh": 5.20601310483871
+        },
+        "trips": {
+            "total_completed_trips": 22331,
+            "post_warmup_completed_trips": 19464,
+            "mean_duration_s": 578.1298397040691,
+            "mean_time_loss_s": 437.06851572133166,
+            "mean_waiting_time_s": 295.4115289765721,
+            "mean_trip_speed_kmh": 14.50880625142667,
+            "mean_route_length_m": 1330.810061138512
+        }
+    }
+]

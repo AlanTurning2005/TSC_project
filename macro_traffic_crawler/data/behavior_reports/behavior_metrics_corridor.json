@@ -1,0 +1,36 @@
+{
+  "by_type": {
+    "motorcycle": {
+      "count": 50,
+      "mean_speed_kmh": 33.01,
+      "mean_waiting_time_s": 0.0,
+      "mean_time_loss_s": 1.21,
+      "lane_changes": 22
+    },
+    "passenger": {
+      "count": 7,
+      "mean_speed_kmh": 33.79,
+      "mean_waiting_time_s": 0.0,
+      "mean_time_loss_s": 1.16,
+      "lane_changes": 0
+    },
+    "bus": {
+      "count": 3,
+      "mean_speed_kmh": 29.31,
+      "mean_waiting_time_s": 0.0,
+      "mean_time_loss_s": 0.39,
+      "lane_changes": 1
+    }
+  },
+  "overall": {
+    "total_departed": 60,
+    "total_arrived": 60,
+    "mean_speed_kmh": 32.91,
+    "mean_waiting_time_s": 0.0,
+    "mean_time_loss_s": 1.17,
+    "total_teleports": 0,
+    "total_sublane_maneuvers": 0,
+    "total_lane_changes": 23,
+    "lateral_interactions": 0
+  }
+}

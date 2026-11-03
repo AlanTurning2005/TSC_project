@@ -39,6 +39,9 @@ macro_traffic_crawler/
 │
 ├── 04_sumo_bridge/                # [Giai đoạn 4: Cầu nối SUMO & Thẩm định Kiểm chuẩn GEH]
 │   ├── generate_sumo_counts.py    # Quy đổi PCU (TCVN 104:2007) & sinh file đếm edge_counts.xml
+│   ├── build_priority_scenario.py # Chuyển đổi mạng lưới sang nút ưu tiên & tạo kịch bản không đèn
+│   ├── vtypes_config.json         # Cấu hình hành vi vi mô và đặc tính phương tiện hỗn hợp TP.HCM
+│   ├── test_vtypes_behavior.py    # Kiểm thử đo lường định lượng hành vi phương tiện (Corridor / Q1 30 phút)
 │   └── evaluate_simulation_geh.py # Kiểm chuẩn đối sánh GEH (UK DMRB) và Vận tốc thực nghiệm
 │
 ├── data/                          # [Thư mục dữ liệu phân tầng]

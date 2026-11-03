@@ -13,10 +13,21 @@ env/
 .idea/
 
 # Các file log/kết quả đầu ra của SUMO phát sinh khi chạy
-sumo_scenarios/**/tripinfo.xml
-sumo_scenarios/**/summary.xml
-sumo_scenarios/**/queue.xml
+*tripinfo*.xml
+*edgedata*.xml
+*lanechange*.xml
+*summary*.xml
+*queue*.xml
 *.log
+
+# File trung gian khi chạy test hành vi hoặc sweep độ nhạy
+macro_traffic_crawler/data/behavior_reports/**/*.xml
+macro_traffic_crawler/data/behavior_reports/mini_corridor/
+!macro_traffic_crawler/data/behavior_reports/tested_vtypes.add.xml
+sumo_scenarios/lambda_sensitivity_sweep/
+
+# Log của crawler
+macro_traffic_crawler/*.log
 
 # Bỏ qua file chứa key thật
 .env

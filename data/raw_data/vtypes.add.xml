@@ -1,12 +1,13 @@
 <additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
     <!-- ============================================================================== -->
-    <!-- ĐỊNH NGHĨA PHƯƠNG TIỆN GIAO THÔNG HỖN HỢP TP. HỒ CHÍ MINH (TCVN 104:2007)      -->
-    <!-- Hỗ trợ Sublane Model để mô phỏng chính xác xe máy luồn lách tự do              -->
+    <!-- ĐỊNH NGHĨA PHƯƠNG TIỆN GIAO THÔNG HỖN HỢP TP. HỒ CHÍ MINH (TCVN 13592:2022)     -->
+    <!-- Đã chuẩn hóa toàn diện theo tài liệu HCMC_TRAFFIC_SPECIFICATIONS_AND_THEORY.md   -->
+    <!-- (Vu & Preston 2023, Trinh et al. 2021, Dung et al. 2015, Guin et al. 2026)      -->
     <!-- ============================================================================== -->
 
     <vTypeDistribution id="hcmc_mixed">
-        <!-- 1. Xe máy (85% dòng xe): luồn lách tự do, khoảng cách ngang nhỏ (0.2m) -->
-        <!-- maxSpeed = 9.72 m/s (~35 km/h): Phù hợp với vận tốc tự do thực nghiệm v0 = 30-35 km/h của TomTom tại Quận 1 -->
+        <!-- 1. Xe máy (85% dòng xe): luồn lách tự do, khoảng cách ngang nhỏ minGapLat=0.25m -->
+        <!-- maxSpeed = 9.72 m/s (~35 km/h): Đồng bộ vận tốc trần tự do thực tế TomTom tại Q1 -->
         <vType id="motorcycle"
                vClass="motorcycle"
                guiShape="motorcycle"
@@ -15,20 +16,29 @@
                width="0.8"
                height="1.2"
                maxSpeed="9.72"
-               accel="2.5"
-               decel="4.5"
-               emergencyDecel="6.0"
-               sigma="0.5"
+               accel="1.5"
+               decel="2.0"
+               emergencyDecel="5.0"
+               tau="0.6"
+               sigma="0.7"
+               speedFactor="1.0"
+               speedDev="0.0"
                minGap="0.5"
                latAlignment="arbitrary"
-               minGapLat="0.2"
+               minGapLat="0.25"
                lcSublane="1.0"
-               lcPushy="0.8"
+               lcPushy="0.5"
                lcAssertive="1.2"
+               lcStrategic="1.59"
+               lcCooperative="0.3"
+               lcSpeedGain="1.0"
+               lcKeepRight="0.1"
+               lcImpatience="0.3"
+               lcTimeToImpatience="30.0"
                color="0,200,255"/>
 
-        <!-- 2. Xe con / Taxi (12% dòng xe): đi giữa làn, khoảng cách ngang chuẩn -->
-        <!-- maxSpeed = 9.72 m/s (~35 km/h): Đồng bộ vận tốc trần đô thị thực tế mạng lưới Quận 1 -->
+        <!-- 2. Xe con / Taxi (12% dòng xe): đi giữa làn, khoảng cách ngang minGapLat=0.60m -->
+        <!-- maxSpeed = 9.72 m/s (~35 km/h): Bị giam lỏng tốc độ trong dòng xe máy bao quanh -->
         <vType id="passenger"
                vClass="passenger"
                guiShape="passenger"
@@ -37,19 +47,29 @@
                width="1.8"
                height="1.5"
                maxSpeed="9.72"
-               accel="2.0"
-               decel="4.0"
-               emergencyDecel="6.0"
+               accel="1.8"
+               decel="3.0"
+               emergencyDecel="5.5"
+               tau="1.0"
                sigma="0.4"
+               speedFactor="1.0"
+               speedDev="0.0"
                minGap="1.5"
                latAlignment="center"
-               minGapLat="0.6"
+               minGapLat="0.60"
                lcSublane="0.5"
                lcPushy="0.2"
+               lcAssertive="1.0"
+               lcStrategic="1.0"
+               lcCooperative="0.5"
+               lcSpeedGain="1.0"
+               lcKeepRight="0.5"
+               lcImpatience="0.0"
+               lcTimeToImpatience="180.0"
                color="255,255,0"/>
 
-        <!-- 3. Xe buýt đô thị (3% dòng xe): cồng kềnh, chiếm nhiều không gian -->
-        <!-- maxSpeed = 8.33 m/s (~30 km/h): Vận tốc thực tế của buýt nội đô dừng đón trả khách -->
+        <!-- 3. Xe buýt đô thị (3% dòng xe): cồng kềnh, khối lượng lớn, moving bottleneck -->
+        <!-- maxSpeed = 8.33 m/s (~30 km/h): Vận tốc thực tế của xe buýt tuyến nội đô -->
         <vType id="bus"
                vClass="bus"
                guiShape="bus"
@@ -58,13 +78,25 @@
                width="2.5"
                height="3.2"
                maxSpeed="8.33"
-               accel="1.2"
-               decel="3.0"
-               emergencyDecel="5.0"
+               accel="1.0"
+               decel="2.0"
+               emergencyDecel="4.0"
+               tau="1.2"
                sigma="0.3"
+               speedFactor="1.0"
+               speedDev="0.0"
                minGap="2.5"
                latAlignment="center"
-               minGapLat="0.8"
+               minGapLat="0.80"
+               lcSublane="0.0"
+               lcPushy="0.0"
+               lcAssertive="1.0"
+               lcStrategic="1.0"
+               lcCooperative="0.5"
+               lcSpeedGain="0.5"
+               lcKeepRight="0.8"
+               lcImpatience="0.0"
+               lcTimeToImpatience="180.0"
                color="0,255,100"/>
     </vTypeDistribution>
 </additional>

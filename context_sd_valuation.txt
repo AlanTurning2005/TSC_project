@@ -1,0 +1,14 @@
+d:\anaconda\python.exe macro_traffic_crawler/01_ingestion/scheduled_crawler.py --all-day --interval 60
+
+=======
+
+Document about simulation data evaluation
+
+- DEC POMDP: 
+Khi sử dụng O_i (Không gian quan sát cục bộ ): dữ liệu ở đây có thể 
+được ghi nhận bởi SUMO đúng không ?
+
+hàm phàn thưởng phải cần được cân nhắc lại ?
+
+
+

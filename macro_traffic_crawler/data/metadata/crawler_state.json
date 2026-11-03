@@ -1,6 +1,6 @@
 {
-  "utc_date": "2026-10-20",
-  "active_key_index": 7,
+  "utc_date": "2026-11-01",
+  "active_key_index": 9,
   "keys_usage": {
     "69iqTfzLLKybgfDXB22ZjfK5weQA9NOY": 2480,
     "BpMSZWxg88srCIXZromlxIW1ENe1H0TD": 2480,
@@ -9,9 +9,9 @@
     "slylm9ncPXEYEv36X1OVLZgqRyRQN69I": 2480,
     "1jab7y2x3EQN1UrQO0eCL6claVyGnm4C": 2480,
     "Gqxo7eE68OQGpTIrDYQEhL8Zo70CHgNT": 2480,
-    "LAFYDsYDSZsGPQDiNO4Q39nrnJSiOnWL": 1648,
-    "r2DOLT80hjUEhhQjuINPxKADwJHdzxnu": 0,
-    "LCjFDkOgOYmFuYGIQRKV2PF26nlJ3hla": 0
+    "LAFYDsYDSZsGPQDiNO4Q39nrnJSiOnWL": 2480,
+    "r2DOLT80hjUEhhQjuINPxKADwJHdzxnu": 2480,
+    "LCjFDkOgOYmFuYGIQRKV2PF26nlJ3hla": 2480
   },
   "exhausted_keys": [
     "69iqTfzLLKybgfDXB22ZjfK5weQA9NOY",
@@ -20,6 +20,8 @@
     "wlneJYIzXAtsoRp1I1PtIB24VpkgJqyb",
     "slylm9ncPXEYEv36X1OVLZgqRyRQN69I",
     "1jab7y2x3EQN1UrQO0eCL6claVyGnm4C",
-    "Gqxo7eE68OQGpTIrDYQEhL8Zo70CHgNT"
+    "Gqxo7eE68OQGpTIrDYQEhL8Zo70CHgNT",
+    "LAFYDsYDSZsGPQDiNO4Q39nrnJSiOnWL",
+    "r2DOLT80hjUEhhQjuINPxKADwJHdzxnu"
   ]
 }
