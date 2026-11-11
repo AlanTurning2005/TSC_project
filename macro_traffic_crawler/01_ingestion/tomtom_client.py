@@ -56,9 +56,9 @@ class TomTomTrafficClient:
                     flow = raw_data.get("flowSegmentData", {})
                     return self._parse_flow_data(lat, lon, flow, raw_data)
 
-                elif response.status_code == 403:
-                    # Hết quota hoặc key không hợp lệ
-                    raise QuotaExceededError(f"HTTP 403: {response.text[:100]}")
+                elif response.status_code in (401, 403):
+                    # 401: Key không hợp lệ / sai thông tin; 403: Hết quota
+                    raise QuotaExceededError(f"HTTP {response.status_code}: {response.text[:100]}")
 
                 elif response.status_code == 429:
                     wait_time = attempt * 2

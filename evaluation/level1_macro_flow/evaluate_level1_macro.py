@@ -57,6 +57,185 @@ from baseline_engine import load_multiday_traffic_data, compute_lodo_benchmark_a
 from statistical_tester import spatial_cluster_bootstrap
 
 
+def parse_sumo_tripinfo(
+    xml_path: Union[str, Path],
+    warmup_sec: float = 0.0,
+    total_inserted: Optional[int] = None,
+    cohort_start_sec: Optional[float] = None,
+    cohort_end_sec: Optional[float] = None,
+    cohort_inserted: Optional[int] = None,
+) -> Dict[str, Any]:
+    r"""
+    Trích xuất và phân tích các chỉ số động lực học chuyến đi (Trip Dynamics) từ tệp tripinfo XML của SUMO.
+    Hỗ trợ cơ chế Gắn thẻ Đoàn xe Cao điểm (Peak Cohort Tagging):
+      - Đánh dấu và theo dõi nhóm xe xuất phát trong khung [cohort_start_sec, cohort_end_sec].
+      - Cho phép đoàn xe này tiếp tục chạy hòa vào dòng xe nền sau giờ cao điểm để đo tỷ lệ hoàn thành (CR)
+        và độ trễ thực tế mà không bị cắt cụt nhân tạo (triệt tiêu Right-Censoring Bias).
+
+    Args:
+        xml_path: Đường dẫn tệp tripinfo XML của SUMO.
+        warmup_sec: Thời gian warm-up (giây). Chỉ tính toán thống kê chi tiết cho xe xuất phát sau mốc này.
+        total_inserted: Tổng số xe được nạp vào mạng (nếu có, để tính Completion Rate chính xác).
+        cohort_start_sec: Giây bắt đầu của cửa sổ đoàn xe cần gắn thẻ (ví dụ 3600.0 cho 07:00).
+        cohort_end_sec: Giây kết thúc của cửa sổ đoàn xe cần gắn thẻ (ví dụ 10800.0 cho 09:00).
+        cohort_inserted: Tổng số xe được nạp riêng trong khung cohort (để tính cohort CR%).
+
+    Returns:
+        Dict chứa các chỉ số động lực học chuyến đi.
+    """
+    trip_file = Path(xml_path).resolve()
+    if not trip_file.exists():
+        print(f"[-] Cảnh báo: Không tìm thấy tệp tripinfo XML tại {trip_file}. Bỏ qua thống kê tripinfo.")
+        return {}
+
+    try:
+        tree = ET.parse(trip_file)
+        root = tree.getroot()
+        all_trips = root.findall("tripinfo")
+        if not all_trips:
+            return {"total_completed_trips": 0}
+
+        total_completed = len(all_trips)
+        durations = []
+        time_losses = []
+        waiting_times = []
+        route_lengths = []
+        post_warmup_trips = 0
+
+        for t in all_trips:
+            depart = float(t.get("depart", "0.0"))
+            dur = float(t.get("duration", "0.0"))
+            tl = float(t.get("timeLoss", "0.0"))
+            wt = float(t.get("waitingTime", "0.0"))
+            rl = float(t.get("routeLength", "0.0"))
+
+            if depart >= warmup_sec:
+                post_warmup_trips += 1
+                durations.append(dur)
+                time_losses.append(tl)
+                waiting_times.append(wt)
+                route_lengths.append(rl)
+
+        # Nếu không có xe nào sau warm-up (ví dụ warmup > max_depart), dùng toàn bộ xe
+        eval_durations = durations if durations else [float(t.get("duration", 0)) for t in all_trips]
+        eval_time_losses = time_losses if time_losses else [float(t.get("timeLoss", 0)) for t in all_trips]
+        eval_waiting_times = waiting_times if waiting_times else [float(t.get("waitingTime", 0)) for t in all_trips]
+        eval_route_lengths = route_lengths if route_lengths else [float(t.get("routeLength", 0)) for t in all_trips]
+
+        mean_duration = float(np.mean(eval_durations)) if eval_durations else 0.0
+        mean_time_loss = float(np.mean(eval_time_losses)) if eval_time_losses else 0.0
+        mean_waiting = float(np.mean(eval_waiting_times)) if eval_waiting_times else 0.0
+        mean_route_len = float(np.mean(eval_route_lengths)) if eval_route_lengths else 0.0
+        mean_speed_kmh = float((mean_route_len / mean_duration * 3.6)) if mean_duration > 0 else 0.0
+
+        cr_pct = None
+        if total_inserted is not None and total_inserted > 0:
+            cr_pct = round(float(total_completed / total_inserted * 100.0), 2)
+
+        res_dict = {
+            "total_completed_trips": total_completed,
+            "warmup_sec": warmup_sec,
+            "post_warmup_completed_trips": post_warmup_trips,
+            "completion_rate_pct": cr_pct,
+            "mean_duration_s": round(mean_duration, 2),
+            "mean_time_loss_s": round(mean_time_loss, 2),
+            "mean_waiting_time_s": round(mean_waiting, 2),
+            "mean_route_length_m": round(mean_route_len, 2),
+            "mean_trip_speed_kmh": round(mean_speed_kmh, 2),
+        }
+
+        # Cơ chế Gắn thẻ Đoàn xe Cao điểm (Peak Cohort Tagging)
+        if cohort_start_sec is not None and cohort_end_sec is not None:
+            cohort_trips = [
+                t for t in all_trips
+                if cohort_start_sec <= float(t.get("depart", "0.0")) <= cohort_end_sec
+            ]
+            c_completed = len(cohort_trips)
+            c_durations = [float(t.get("duration", "0.0")) for t in cohort_trips]
+            c_timelosses = [float(t.get("timeLoss", "0.0")) for t in cohort_trips]
+            c_waits = [float(t.get("waitingTime", "0.0")) for t in cohort_trips]
+            c_lengths = [float(t.get("routeLength", "0.0")) for t in cohort_trips]
+
+            c_mean_dur = float(np.mean(c_durations)) if c_durations else 0.0
+            c_mean_loss = float(np.mean(c_timelosses)) if c_timelosses else 0.0
+            c_mean_wait = float(np.mean(c_waits)) if c_waits else 0.0
+            c_mean_len = float(np.mean(c_lengths)) if c_lengths else 0.0
+            c_speed = float(c_mean_len / c_mean_dur * 3.6) if c_mean_dur > 0 else 0.0
+
+            c_cr = None
+            if cohort_inserted is not None and cohort_inserted > 0:
+                c_cr = round(float(c_completed / cohort_inserted * 100.0), 2)
+
+            res_dict["cohort_metrics"] = {
+                "cohort_window_sec": [cohort_start_sec, cohort_end_sec],
+                "cohort_completed_trips": c_completed,
+                "cohort_completion_rate_pct": c_cr,
+                "cohort_mean_duration_s": round(c_mean_dur, 2),
+                "cohort_mean_time_loss_s": round(c_mean_loss, 2),
+                "cohort_mean_waiting_time_s": round(c_mean_wait, 2),
+                "cohort_mean_trip_speed_kmh": round(c_speed, 2),
+            }
+
+        return res_dict
+    except Exception as e:
+        print(f"[-] Lỗi khi trích xuất tệp tripinfo {trip_file}: {e}")
+        return {}
+
+
+def parse_sumo_summary(xml_path: Union[str, Path]) -> Dict[str, Any]:
+    r"""
+    Trích xuất các chỉ số nạp và tắc nghẽn mạng lưới từ tệp summary XML của SUMO.
+
+    Các chỉ số:
+      - loaded: Tổng số xe được tạo ra theo lịch trình
+      - inserted: Tổng số xe đã thực sự nạp thành công vào mạng
+      - running: Số xe còn đang lưu thông trong mạng tại thời điểm kết thúc
+      - waiting: Số xe bị tắc nghẽn ở cổng biên (chờ được nạp)
+      - arrived: Tổng số xe đến đích
+      - teleports: Số lần phương tiện bị teleport (nhảy cóc) do nghẽn dead-lock (> time-to-teleport)
+      - teleport_rate_pct: Tỷ lệ teleport / số xe nạp (chỉ báo gridlock trực tiếp)
+      - insertion_ratio_pct: Tỷ lệ nạp thành công (inserted / loaded)
+    """
+    sum_file = Path(xml_path).resolve()
+    if not sum_file.exists():
+        return {}
+
+    try:
+        tree = ET.parse(sum_file)
+        root = tree.getroot()
+        steps = root.findall("step")
+        if not steps:
+            return {}
+
+        last_step = steps[-1]
+        loaded = float(last_step.get("loaded", "0.0"))
+        inserted = float(last_step.get("inserted", "0.0"))
+        running = float(last_step.get("running", "0.0"))
+        waiting = float(last_step.get("waiting", "0.0"))
+        arrived = float(last_step.get("arrived", "0.0"))
+        teleports = float(last_step.get("teleports", "0.0"))
+
+        ins_ratio = (inserted / loaded * 100.0) if loaded > 0 else 100.0
+        teleport_rate = (teleports / inserted * 100.0) if inserted > 0 else 0.0
+        completion_ratio = (arrived / inserted * 100.0) if inserted > 0 else 100.0
+
+        return {
+            "summary_total_loaded": int(loaded),
+            "summary_total_inserted": int(inserted),
+            "summary_running_end": int(running),
+            "summary_waiting_gate": int(waiting),
+            "summary_arrived": int(arrived),
+            "summary_teleports": int(teleports),
+            "teleport_rate_pct": round(teleport_rate, 3),
+            "insertion_rate_pct": round(ins_ratio, 2),
+            "summary_completion_rate_pct": round(completion_ratio, 2),
+            "is_gridlock_detected": bool(teleports > 0 or waiting > 50),
+        }
+    except Exception as e:
+        print(f"[-] Lỗi khi trích xuất tệp summary {sum_file}: {e}")
+        return {}
+
+
 def parse_sumo_edgedata(xml_path: Union[str, Path]) -> pd.DataFrame:
     r"""
     Trích xuất và tổng hợp vận tốc trung bình không gian (Space-Mean Speed) từ tệp XML edgedata của SUMO.
@@ -381,6 +560,13 @@ def run_level1_evaluation(
     output_dir: Union[str, Path] = "evaluation/level1_macro_flow/reports",
     test_date: Optional[str] = None,
     min_confidence_floor: float = 0.40,
+    tripinfo_path: Optional[Union[str, Path]] = None,
+    summary_path: Optional[Union[str, Path]] = None,
+    warmup_sec: float = 0.0,
+    total_inserted: Optional[int] = None,
+    cohort_start_sec: Optional[float] = None,
+    cohort_end_sec: Optional[float] = None,
+    cohort_inserted: Optional[int] = None,
 ) -> Dict[str, Any]:
     r"""
     Thực thi quy trình kiểm định vĩ mô cấp độ 1 hoàn chỉnh từ A đến Z.
@@ -396,6 +582,47 @@ def run_level1_evaluation(
     print(f"\n[1/5] Đang đọc tệp SUMO edgedata XML: {edgedata_path}...")
     sim_df = parse_sumo_edgedata(edgedata_path)
     print(f"      + Tìm thấy {len(sim_df)} way độc lập được mô phỏng trong SUMO.")
+
+    # 1b. Trích xuất các chỉ số nạp và nghẽn mạng nếu có summary XML
+    summary_metrics = {}
+    if summary_path:
+        print(f"\n[1b/5] Đang đọc tệp SUMO summary XML: {summary_path}...")
+        summary_metrics = parse_sumo_summary(summary_path)
+        if summary_metrics:
+            print(f"      + Xe nạp (inserted): {summary_metrics.get('summary_total_inserted', 0)} | "
+                  f"Xe kẹt cổng biên (waiting): {summary_metrics.get('summary_waiting_gate', 0)} | "
+                  f"Teleports: {summary_metrics.get('summary_teleports', 0)} ({summary_metrics.get('teleport_rate_pct', 0.0):.2f}%)")
+
+    # Xác định tổng số xe nạp (phục vụ tính Completion Rate)
+    eff_inserted = total_inserted
+    if eff_inserted is None and summary_metrics:
+        eff_inserted = summary_metrics.get("summary_total_inserted")
+
+    # 1c. Trích xuất chỉ số hành trình và độ trễ nếu có tripinfo XML
+    tripinfo_metrics = {}
+    if tripinfo_path:
+        print(f"\n[1c/5] Đang đọc tệp SUMO tripinfo XML: {tripinfo_path} (warmup={warmup_sec}s)...")
+        tripinfo_metrics = parse_sumo_tripinfo(
+            tripinfo_path,
+            warmup_sec=warmup_sec,
+            total_inserted=eff_inserted,
+            cohort_start_sec=cohort_start_sec,
+            cohort_end_sec=cohort_end_sec,
+            cohort_inserted=cohort_inserted,
+        )
+        if tripinfo_metrics:
+            cr_val = tripinfo_metrics.get("completion_rate_pct")
+            cr_str = f"{cr_val:.2f}%" if cr_val is not None else "Chưa cung cấp tổng số xe nạp"
+            print(f"      + Chuyến hoàn thành: {tripinfo_metrics.get('total_completed_trips', 0)} "
+                  f"(sau warm-up: {tripinfo_metrics.get('post_warmup_completed_trips', 0)}) | CR%: {cr_str}")
+            print(f"      + Độ trễ trung bình (TimeLoss): {tripinfo_metrics.get('mean_time_loss_s', 0.0):.1f}s | "
+                  f"Thời gian chờ đèn (WaitingTime): {tripinfo_metrics.get('mean_waiting_time_s', 0.0):.1f}s")
+            if "cohort_metrics" in tripinfo_metrics:
+                cm = tripinfo_metrics["cohort_metrics"]
+                ccr_str = f"{cm['cohort_completion_rate_pct']:.2f}%" if cm.get("cohort_completion_rate_pct") is not None else "N/A"
+                print(f"      [Cohort Tagging] Khung [{cm['cohort_window_sec'][0]:.0f}s - {cm['cohort_window_sec'][1]:.0f}s]: "
+                      f"Chuyến hoàn thành = {cm['cohort_completed_trips']} | Cohort CR = {ccr_str} | "
+                      f"Mean TimeLoss = {cm['cohort_mean_time_loss_s']:.1f}s | Mean Speed = {cm['cohort_mean_trip_speed_kmh']:.1f} km/h")
 
     # 2. Liên kết dữ liệu và nạp baselines
     print(f"\n[2/5] Đang liên kết với dữ liệu kiểm chuẩn TomTom ({benchmark_source})...")
@@ -439,6 +666,12 @@ def run_level1_evaluation(
 
     # 5. Xuất các báo cáo
     print("\n[5/5] Đang xuất báo cáo và biểu đồ chuẩn học thuật...")
+    network_dynamics = {}
+    if summary_metrics:
+        network_dynamics.update(summary_metrics)
+    if tripinfo_metrics:
+        network_dynamics.update(tripinfo_metrics)
+
     full_report_json = {
         "evaluation_name": "Level 1 Macro Flow Evaluation",
         "test_date": anchors["test_day"],
@@ -456,6 +689,9 @@ def run_level1_evaluation(
         "pillar4_los_regimes": metrics_summary["pillar4_los_regimes"],
         "spatial_cluster_bootstrap": boot_res,
     }
+
+    if network_dynamics:
+        full_report_json["network_flow_dynamics"] = network_dynamics
 
     json_path = out_dir / "level1_metrics_summary.json"
     with open(json_path, "w", encoding="utf-8") as f:
@@ -478,6 +714,13 @@ def run_level1_evaluation(
     print("[+] HOÀN TẤT ĐÁNH GIÁ VĨ MÔ CẤP ĐỘ 1!")
     print(f"    • Trạng thái khoa học: {sci_status}")
     print(f"    • Đánh giá: {sci_message}")
+    if network_dynamics:
+        if "completion_rate_pct" in network_dynamics and network_dynamics["completion_rate_pct"] is not None:
+            print(f"    • Tỷ lệ hoàn thành chuyến (CR): {network_dynamics['completion_rate_pct']:.2f}%")
+        if "mean_time_loss_s" in network_dynamics:
+            print(f"    • Độ trễ trung bình (TimeLoss): {network_dynamics['mean_time_loss_s']:.1f}s")
+        if "teleport_rate_pct" in network_dynamics:
+            print(f"    • Tỷ lệ Teleport (Gridlock): {network_dynamics['teleport_rate_pct']:.3f}%")
     print("=" * 75)
 
     return full_report_json
@@ -487,6 +730,20 @@ def main():
     parser = argparse.ArgumentParser(description="Đánh giá Vĩ mô Cấp độ 1 (Level 1 Macro Flow Evaluation) cho SUMO")
     parser.add_argument("--edgedata", type=str, default="sumo_scenarios/q1_20261020_6h/simulation_edgedata_20261020_6h.xml",
                         help="Đường dẫn tệp edgedata XML của SUMO")
+    parser.add_argument("--tripinfo", type=str, default=None,
+                        help="Đường dẫn tệp tripinfo XML của SUMO (tùy chọn)")
+    parser.add_argument("--summary", type=str, default=None,
+                        help="Đường dẫn tệp summary XML của SUMO (tùy chọn)")
+    parser.add_argument("--warmup-sec", type=float, default=0.0,
+                        help="Thời gian warm-up mô phỏng (giây), mặc định 0.0")
+    parser.add_argument("--total-inserted", type=int, default=None,
+                        help="Tổng số xe được nạp vào mạng (phục vụ tính Completion Rate)")
+    parser.add_argument("--cohort-start", type=float, default=None,
+                        help="Giây bắt đầu của đoàn xe cao điểm cần gắn thẻ (ví dụ 3600.0 cho 07:00)")
+    parser.add_argument("--cohort-end", type=float, default=None,
+                        help="Giây kết thúc của đoàn xe cao điểm cần gắn thẻ (ví dụ 10800.0 cho 09:00)")
+    parser.add_argument("--cohort-inserted", type=int, default=None,
+                        help="Tổng số xe nạp riêng trong khung cohort (để tính cohort CR%)")
     parser.add_argument("--benchmark-csv", type=str, default="macro_traffic_crawler/data/processed/*.csv",
                         help="Đường dẫn hoặc mẫu glob tệp dữ liệu kiểm chuẩn TomTom CSV")
     parser.add_argument("--test-date", type=str, default=None,
@@ -504,6 +761,13 @@ def main():
         output_dir=args.output_dir,
         test_date=args.test_date,
         min_confidence_floor=args.min_confidence,
+        tripinfo_path=args.tripinfo,
+        summary_path=args.summary,
+        warmup_sec=args.warmup_sec,
+        total_inserted=args.total_inserted,
+        cohort_start_sec=args.cohort_start,
+        cohort_end_sec=args.cohort_end,
+        cohort_inserted=args.cohort_inserted,
     )
 
 

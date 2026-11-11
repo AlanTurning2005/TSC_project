@@ -19,7 +19,7 @@ Các tính năng khoa học cốt lõi:
    - Bước 1 (A Priori Check): Thử nghiệm với w_pen = 0. Nếu không vi phạm -> loại bỏ w_pen.
    - Bước 2: Nếu có vi phạm vật lý, kích hoạt w_pen = \Delta_{\text{noise}} / (\delta^*)^2 ~ 60 - 80 km/h.
 4. Sinh dòng nhu cầu liên tục (Piecewise Linear Interpolation) tích hợp mô hình Sublane:
-   80% xe máy (latAlignment="arbitrary"), 15% ô tô, 5% xe buýt.
+   85% xe máy (latAlignment="arbitrary"), 12% ô tô, 3% xe buýt.
 =============================================================================
 """
 
@@ -227,13 +227,14 @@ def generate_piecewise_linear_routes(
     lambda_vec: np.ndarray,
     slice_duration_s: float = 1800.0,
     random_seed: int = 42,
-    p_motorcycle: float = 0.80,
-    p_passenger: float = 0.15,
-    p_bus: float = 0.05,
+    p_motorcycle: float = 0.85,
+    p_passenger: float = 0.12,
+    p_bus: float = 0.03,
 ) -> Path:
     r"""
     Sinh tệp lộ trình (.rou.xml) với nhu cầu biến thiên mượt mà (Piecewise Linear Rate),
-    tích hợp cơ cấu phương tiện hỗn hợp Sublane 80% xe máy, 15% ô tô con.
+    tích hợp cơ cấu phương tiện hỗn hợp Sublane 85% xe máy, 12% ô tô con, 3% xe buýt
+    (chuẩn hóa theo HCMC_TRAFFIC_SPECIFICATIONS_AND_THEORY.md và vtypes_config.json).
 
     Args:
         net_file: Tệp mạng lưới SUMO (.net.xml).
@@ -253,19 +254,23 @@ def generate_piecewise_linear_routes(
     root.set("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
     root.set("xsi:noNamespaceSchemaLocation", "http://sumo.dlr.de/xsd/routes_file.xsd")
 
-    # 1. Khai báo các loại phương tiện vi mô (Sublane Model)
+    # 1. Khai báo các loại phương tiện vi mô (Sublane Model chuẩn hóa HCMC)
     vtype_mc = ET.SubElement(root, "vType")
     vtype_mc.attrib = {
         "id": "motorcycle",
         "vClass": "motorcycle",
         "length": "1.8",
         "width": "0.8",
-        "maxSpeed": "11.11", # 40 km/h
-        "accel": "2.5",
-        "decel": "4.5",
-        "sigma": "0.5",
+        "maxSpeed": "9.72",  # 35 km/h (neo theo v_free TomTom)
+        "accel": "1.5",
+        "decel": "2.0",
+        "emergencyDecel": "5.0",
+        "tau": "0.6",        # Vu & Preston (2023)
+        "sigma": "0.7",
         "latAlignment": "arbitrary",
-        "minGapLat": "0.15",
+        "minGapLat": "0.25", # Khớp 1:1 lưới sublane 0.25m
+        "lcSublane": "1.0",
+        "lcPushy": "0.5",
     }
 
     vtype_car = ET.SubElement(root, "vType")
@@ -274,24 +279,34 @@ def generate_piecewise_linear_routes(
         "vClass": "passenger",
         "length": "4.5",
         "width": "1.8",
-        "maxSpeed": "13.89", # 50 km/h
-        "accel": "2.0",
-        "decel": "4.5",
-        "sigma": "0.5",
+        "maxSpeed": "9.72",  # 35 km/h (bị giam lỏng trong dòng xe máy)
+        "accel": "1.8",
+        "decel": "3.0",
+        "emergencyDecel": "5.5",
         "tau": "1.0",
-        "minGapLat": "0.30",
+        "sigma": "0.4",
+        "latAlignment": "center",
+        "minGapLat": "0.60", # Đệm an toàn hông tránh phanh giả
+        "lcSublane": "0.5",
+        "lcPushy": "0.2",
     }
 
     vtype_bus = ET.SubElement(root, "vType")
     vtype_bus.attrib = {
         "id": "bus",
         "vClass": "bus",
-        "length": "10.0",
+        "length": "10.5",
         "width": "2.5",
-        "maxSpeed": "11.11",
-        "accel": "1.2",
-        "decel": "3.5",
+        "maxSpeed": "8.33",  # 30 km/h (nội đô)
+        "accel": "1.0",
+        "decel": "2.0",
+        "emergencyDecel": "4.0",
+        "tau": "1.2",
         "sigma": "0.3",
+        "latAlignment": "center",
+        "minGapLat": "0.80", # Tránh điểm mù sườn xe buýt
+        "lcSublane": "0.0",  # Khóa lách làn phụ (moving bottleneck)
+        "lcPushy": "0.0",
     }
 
     # 2. Khai báo phân bố phương tiện (vTypeDistribution)

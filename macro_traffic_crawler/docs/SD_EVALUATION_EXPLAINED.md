@@ -77,8 +77,8 @@ $$\mathcal{M} = \langle \mathcal{N}, \mathcal{S}, \{\mathcal{A}_i\}, \mathcal{P}
 
 ### 2.2. Mô hình Dòng Hỗn hợp Đa phương tiện Không phân làn (Sublane Model)
 * **Đặc thù giao thông TP.HCM:** Xe máy chiếm tỷ trọng áp đảo, di chuyển không tuân theo làn cứng mà luồn lách linh hoạt qua các khoảng trống giữa các ô tô (*Minh et al., 2005*).
-* **Cấu hình Chia làn phụ SUMO:** Kích hoạt `--lateral-resolution 0.32` (*Erdmann, 2015*). Với độ phân giải $0{,}32\text{m}$, nhỏ hơn nhiều so với bề rộng xe máy ($0{,}8\text{m}$), xe máy có thể chạy song song 2–3 chiếc trong cùng một làn vật lý hoặc len lỏi khi dừng đèn đỏ (`latAlignment="arbitrary"`).
-* **Cơ cấu Phương tiện Thiết kế:** Chuẩn hóa $80\%$ xe máy, $15\%$ ô tô con, $5\%$ xe buýt/xe tải nhẹ (dựa trên các khảo sát thực nghiệm tại TP.HCM của *Dung et al., 2015*). Đây là **giả định mô hình hóa minh bạch** của đề tài.
+* **Cấu hình Chia làn phụ SUMO:** Kích hoạt `--lateral-resolution 0.25` (*Erdmann, 2015*). Với độ phân giải $0{,}25\text{m}$, khớp chính xác 1:1 với khoảng cách an toàn ngang tối thiểu `minGapLat = 0.25m` của xe máy, xe máy có thể chạy song song 2–3 chiếc trong cùng một làn vật lý hoặc len lỏi khi dừng đèn đỏ (`latAlignment="arbitrary"`).
+* **Cơ cấu Phương tiện Thiết kế:** Chuẩn hóa $85\%$ xe máy, $12\%$ ô tô con, $3\%$ xe buýt (dựa trên các khảo sát thực nghiệm tại TP.HCM của *Dung et al., 2015* và TCVN 13592:2022). Đây là **giả định mô hình hóa minh bạch** của đề tài.
 
 ---
 
@@ -428,7 +428,7 @@ Toàn bộ sự chặt chẽ của phương pháp luận dữ liệu này sẽ �
 
 ---
 
-### Câu hỏi 8: *"Giải thích ý nghĩa và căn cứ của các tham số sinh lộ trình: fringe-factor 8.0, min-distance 400, và Sublane 0.32m?"*
+### Câu hỏi 8: *"Giải thích ý nghĩa và căn cứ của các tham số sinh lộ trình: fringe-factor 8.0, min-distance 400, và Sublane 0.25m?"*
 > **Trả lời:**  
 > *"Dạ thưa Thầy/Cô, các tham số này được thiết lập dựa trên bản chất động lực học đô thị TP.HCM:
 > 
@@ -443,5 +443,5 @@ Toàn bộ sự chặt chẽ của phương pháp luận dữ liệu này sẽ �
 > 3. **`--speed-exponent 1.0` (Ưu tiên trục đường lớn):**
 >    - Trọng số chọn tuyến đường tỷ lệ thuận với tốc độ thiết kế của cạnh, hướng luồng xe vào các trục huyết mạch (Điện Biên Phủ, Pasteur, Nam Kỳ Khởi Nghĩa, Võ Văn Tần) thay vì len vào đường nhánh.
 > 
-> 4. **`--lateral-resolution 0.32` và Mô hình Sublane:**
->    - Xe máy TP.HCM rộng $0{,}8\text{m}$ nhưng có hành vi điền đầy không gian rất linh hoạt. Chia mỗi làn thành các dải $0{,}32\text{m}$ cho phép 2–3 xe máy chạy song song trong một làn ô tô hoặc lách qua khe hẹp khi ô tô dừng đèn đỏ, phản ánh đúng hiện thực giao thông hỗn hợp Việt Nam."*
+> 4. **`--lateral-resolution 0.25` và Mô hình Sublane:**
+>    - Xe máy TP.HCM rộng $0{,}8\text{m}$ nhưng có hành vi điền đầy không gian rất linh hoạt. Chia mỗi làn thành các dải $0{,}25\text{m}$ khớp 1:1 với khoảng cách an toàn ngang tối thiểu `minGapLat = 0.25m` của xe máy, triệt tiêu hoàn toàn lỗi làm tròn số học (quantization error), cho phép 2–3 xe máy chạy song song trong một làn ô tô hoặc lách qua khe hẹp khi ô tô dừng đèn đỏ, phản ánh đúng hiện thực giao thông hỗn hợp Việt Nam."*

@@ -1,0 +1,35 @@
+{
+  "target_date": "2026-10-15",
+  "best_value": 21.5946,
+  "best_lambda_vps": [
+    2.674,
+    2.0915,
+    2.4749,
+    3.1056,
+    2.6885,
+    2.0795,
+    1.2685
+  ],
+  "best_params": {
+    "lambda_0630": 2.6739553241203335,
+    "lambda_0700": 2.09148685339978,
+    "lambda_0730": 2.4748658647899706,
+    "lambda_0800": 3.1056176865898237,
+    "lambda_0830": 2.6884637527784947,
+    "lambda_0900": 2.079494406761409,
+    "lambda_0930": 1.2685402115672613
+  },
+  "best_user_attrs": {
+    "bpr_penalty": 0.0,
+    "gbr": 1.0,
+    "icr": 0.5,
+    "prior_term": 3.3239,
+    "rmse_w": 14.596,
+    "smooth_term": 2.1698,
+    "tcr": 0.5,
+    "teleport_rate": 0.5,
+    "timeout_triggered": true,
+    "total_loss": 21.5946
+  },
+  "total_trials": 36
+}

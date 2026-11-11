@@ -297,7 +297,7 @@ Quy trình nạp nhu cầu và hiệu chuẩn mô phỏng vi mô SUMO theo phư�
 flowchart TD
     A["Dữ liệu TomTom Probe Data (v_TomTom, v0, confidence)"] --> B["Khung xương Không gian: randomTrips.py (--fringe-factor)"]
     B --> C["Vector Quy mô Nhu cầu theo Lát cắt Thời gian lambda(t)"]
-    C --> D["Mô phỏng SUMO Sublane (lateral-resolution=0.32, step=0.2s)"]
+    C --> D["Mô phỏng SUMO Sublane (lateral-resolution=0.25, step=0.2s)"]
     D --> E["Xuất edgeData: Vận tốc mô phỏng v_sim(t)"]
     E --> F["Vòng lặp Tối ưu hóa 1D (Khớp v_sim với v_TomTom + Phạt dải BPR)"]
     F -->|Cập nhật lambda*| C
@@ -306,7 +306,7 @@ flowchart TD
 
 1. **Bước 1 (Tiên nghiệm Không gian):** `randomTrips.py` sinh các lộ trình nền với trọng số ưu tiên trục chính và luồng xuyên mạng qua tham số `--fringe-factor`.
 2. **Bước 2 (Hiệu chuẩn Quy mô Thời gian):** Thuật toán tìm kiếm 1 chiều tuần tự tối ưu hóa vector $\boldsymbol{\lambda}(t)$ cho từng lát cắt 15-30 phút sao cho vận tốc SUMO tiệm cận vận tốc TomTom.
-3. **Bước 3 (Thực thi vi mô Sublane):** SUMO kích hoạt cơ chế Sublane Model (`--lateral-resolution 0.32`), `step-length="0.2"`, `collision.action="warn"`.
+3. **Bước 3 (Thực thi vi mô Sublane):** SUMO kích hoạt cơ chế Sublane Model (`--lateral-resolution 0.25`), `step-length="0.2"`, `collision.action="warn"`.
 4. **Bước 4 (Cung cấp Môi trường MARL):** Mô hình được kiểm định qua bộ 3 Baseline (Free-flow, Historical Median, Sàn nhiễu $\Delta_{\text{noise}}/\sqrt{2}$) và 4 trụ cột vận tốc độc lập, sẵn sàng cho huấn luyện chính sách MARL bền vững.
 
 ---

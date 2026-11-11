@@ -29,10 +29,26 @@ sumo_scenarios/lambda_sensitivity_sweep/
 # Log của crawler
 macro_traffic_crawler/*.log
 
-# Bỏ qua file chứa key thật
+# Bỏ qua file chứa key thật & crawler state lưu vết key
 .env
 *.env
 macro_traffic_crawler/.env
+macro_traffic_crawler/data/metadata/crawler_state.json
 
 # Bỏ qua dữ liệu snapshot thô từ crawler (> 1GB)
 macro_traffic_crawler/data/raw/*.json
+
+# Database & Binary Cache
+*.db
+*.sqlite
+*.sqlite3
+*.npz
+
+# File dữ liệu crawler lớn (> 5MB - 21MB) tránh làm phình repo
+macro_traffic_crawler/data/processed/macro_traffic_history.csv
+macro_traffic_crawler/data/processed/macro_traffic_dense_1min.csv
+
+# File lộ trình phụ và checkpoint trung gian của SUMO
+*.rou.alt.xml
+*checkpoint_warmup*.xml
+

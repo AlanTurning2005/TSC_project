@@ -1,0 +1,38 @@
+{
+  "scenario_name": "q1_calibrated_morning_peak",
+  "description": "Kịch bản giao thông cao điểm sáng Quận 1 & 3 hiệu chuẩn qua CMA-ES",
+  "created_at": "2026-11-07T13:41:19.953219",
+  "time_window": "06:00 - 10:00 (14,400s)",
+  "warmup_window": "06:00 - 07:00 (3,600s)",
+  "evaluation_window": "07:00 - 09:30 (9,000s)",
+  "drain_window": "09:30 - 10:00 (1,800s)",
+  "sublane_resolution_m": 0.25,
+  "step_length_s": 0.2,
+  "yellow_time_s": 3.0,
+  "modal_split": "85% Motorcycle, 12% Car, 3% Bus",
+  "calibrated_lambda_vector": [
+    0.85,
+    1.25,
+    1.5,
+    1.35,
+    1.1,
+    0.9,
+    0.85
+  ],
+  "files": {
+    "routes_file": {
+      "name": "calibrated_morning_peak.rou.xml",
+      "sha256": "120fa7b674f2e39cf6d03e52485f67dc68e3fe7a8cd5ddeadd0056a2d6877f70",
+      "size_mb": 4.91
+    },
+    "checkpoint_0700": {
+      "name": "checkpoint_warmup_0700.xml",
+      "sha256": "b2bfd7c6bc81aa0b4d668441184d6454583d1149255ed84883b7915b3b82d3ac",
+      "size_kb": 148.1
+    },
+    "config_file": {
+      "name": "simulation.sumocfg",
+      "sha256": "d0463d009a080aec8f800e66d8c4a9e4ca8a5eb6e11d7af3d869eb1ef04a3055"
+    }
+  }
+}

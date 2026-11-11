@@ -244,7 +244,7 @@ Trong luận văn, sự bất định của ma trận nhu cầu được chuyể
 
 1. **Thiếu Dữ liệu Lưu lượng Đếm thực (Absence of Ground-Truth Counts):** Nhu cầu là nhu cầu tổng hợp suy diễn từ tốc độ; không thể xác nhận độ chính xác tuyệt đối của lưu lượng từng nhánh rẽ.
 2. **Bản chất Dữ liệu Probe Gom cụm của TomTom:** Dữ liệu phản ánh vận tốc trung bình không gian tổng hợp từ các phương tiện định vị, có độ trễ nhất định và tự động fallback về lịch sử khi mật độ thiết bị thấp.
-3. **Giả định Thiết kế về Phương tiện Hỗn hợp:** Tỷ lệ xe máy ($80\%$) và tham số Sublane được thiết lập dựa trên tài liệu nghiên cứu trước (*Minh et al., 2005; Erdmann, 2015*), chưa được hiệu chuẩn riêng bằng camera thị giác máy tính tại từng nút giao.
+3. **Giả định Thiết kế về Phương tiện Hỗn hợp:** Tỷ lệ phương tiện thiết kế ($85\%$ xe máy, $12\%$ ô tô con, $3\%$ xe buýt) và tham số Sublane được thiết lập dựa trên khảo sát thực địa (*Dung et al., 2015; Minh et al., 2005; Erdmann, 2015*) và quy chuẩn TCVN 13592:2022, chưa được hiệu chuẩn riêng bằng camera thị giác máy tính tại từng nút giao.
 4. **Hiện tượng Ràng buộc Nhập nhằng của Tham số $\lambda$:** Do chưa có kế hoạch pha đèn chi tiết ngoài hiện trường, tham số quy mô $\lambda$ có thể bù trừ cho sai số về năng lực nút và chu kỳ đèn.
 5. **Giới hạn Khung Giờ & Điều kiện Thời tiết:** Dữ liệu thu thập ban ngày trong điều kiện bình thường; chưa tích hợp hiện tượng ngập nước triều cường hoặc sự cố tai nạn đột xuất.
 

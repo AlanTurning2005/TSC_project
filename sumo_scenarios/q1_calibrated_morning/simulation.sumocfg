@@ -1,0 +1,26 @@
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+    <input>
+        <!-- Mạng lưới giao thông chuẩn Quận 1 & Quận 3 (34 nút đèn tín hiệu) -->
+        <net-file value="../../data/raw_data/q1_map.net.xml"/>
+        <!-- Lộ trình nhu cầu cao điểm sáng đã hiệu chuẩn qua CMA-ES -->
+        <route-files value="calibrated_morning_peak.rou.xml"/>
+    </input>
+
+    <time>
+        <begin value="0"/>
+        <end value="14400"/>
+        <step-length value="0.2"/>
+    </time>
+
+    <processing>
+        <!-- Kích hoạt Sublane Model: chia làn phụ 0.25m cho xe máy luồn lách tự do -->
+        <lateral-resolution value="0.25"/>
+        <collision.action value="warn"/>
+        <time-to-teleport value="120"/>
+    </processing>
+
+    <report>
+        <verbose value="false"/>
+        <no-step-log value="true"/>
+    </report>
+</configuration>

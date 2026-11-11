@@ -1,0 +1,128 @@
+{
+  "corridor_01_dien_bien_phu_vo_thi_sau": {
+    "name": "Điện Biên Phủ - Võ Thị Sáu (Northern Arterial)",
+    "type": "arterial",
+    "points": [
+      "way_408246393",
+      "way_654858165"
+    ]
+  },
+  "corridor_02_nguyen_thi_minh_khai": {
+    "name": "Nguyễn Thị Minh Khai (Central East-West Arterial)",
+    "type": "arterial",
+    "points": [
+      "way_193256696",
+      "way_326849844",
+      "way_326849845",
+      "way_408845370",
+      "way_747226800",
+      "way_1267006215",
+      "way_1313420763"
+    ]
+  },
+  "corridor_03_nam_ky_khoi_nghia": {
+    "name": "Nam Kỳ Khởi Nghĩa (Major Radial NW-SE)",
+    "type": "radial",
+    "points": [
+      "way_193616433",
+      "way_326771006",
+      "way_329878183",
+      "way_749986988",
+      "way_608262688"
+    ]
+  },
+  "corridor_04_pasteur": {
+    "name": "Pasteur (Major Radial SE-NW)",
+    "type": "radial",
+    "points": [
+      "way_326849846",
+      "way_678315474",
+      "way_678315476",
+      "way_686500792",
+      "way_747231131"
+    ]
+  },
+  "corridor_05_nguyen_dinh_chieu": {
+    "name": "Nguyễn Đình Chiểu (One-way West-East)",
+    "type": "secondary_arterial",
+    "points": [
+      "way_326771005",
+      "way_327048052",
+      "way_1184372243",
+      "way_1267138238",
+      "way_1267653586"
+    ]
+  },
+  "corridor_06_le_duan": {
+    "name": "Lê Duẩn (Central Ceremonial Boulevard)",
+    "type": "boulevard",
+    "points": [
+      "way_747226799",
+      "way_758852506",
+      "way_803279638",
+      "way_1182181717",
+      "way_1395935222"
+    ]
+  },
+  "corridor_07_cong_xa_paris_nguyen_du": {
+    "name": "Công xã Paris - Nguyễn Du - Lý Tự Trọng (Heritage Core)",
+    "type": "core_grid",
+    "points": [
+      "way_35114262",
+      "way_1374006570",
+      "way_1391882257",
+      "way_1391882258",
+      "way_1395935224",
+      "way_329878185",
+      "way_732571882",
+      "way_716065020",
+      "way_803279640",
+      "way_1265822554",
+      "way_1265822570",
+      "way_1414094279"
+    ]
+  },
+  "corridor_08_pham_ngoc_thach": {
+    "name": "Phạm Ngọc Thạch (Turtle Lake Connector)",
+    "type": "connector",
+    "points": [
+      "way_803279639",
+      "way_1157160322",
+      "way_1162554504",
+      "way_1177448206"
+    ]
+  },
+  "corridor_09_tran_quoc_thao_truong_dinh": {
+    "name": "Trần Quốc Thảo - Trương Định (Q3 North-South Corridors)",
+    "type": "connector",
+    "points": [
+      "way_35114553",
+      "way_694942823",
+      "way_694973742",
+      "way_654858471",
+      "way_1162414403",
+      "way_1222962347"
+    ]
+  },
+  "corridor_10_le_quy_don_vo_van_tan_subgrid": {
+    "name": "Lê Quý Đôn - Võ Văn Tần - Bà Huyện Thanh Quan (Q3 Subgrid)",
+    "type": "subgrid",
+    "points": [
+      "way_35112971",
+      "way_658328100",
+      "way_1184372244",
+      "way_35114207",
+      "way_1222962346",
+      "way_327048054",
+      "way_1176155754",
+      "way_205311563",
+      "way_654858472",
+      "way_654861070",
+      "way_35113721",
+      "way_1179966753",
+      "way_192035998",
+      "way_1185423294",
+      "way_700026885"
+    ]
+  }
+}

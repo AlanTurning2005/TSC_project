@@ -1,0 +1,69 @@
+{
+  "num_dates": 7,
+  "dates": [
+    "2026-10-14",
+    "2026-10-15",
+    "2026-10-16",
+    "2026-10-19",
+    "2026-11-07",
+    "2026-11-08",
+    "2026-11-09"
+  ],
+  "num_points": 66,
+  "time_slices": [
+    "06:30",
+    "07:00",
+    "07:30",
+    "08:00",
+    "08:30",
+    "09:00",
+    "09:30"
+  ],
+  "mean_free_flow_speed": 30.02,
+  "mean_historical_median_by_slice": {
+    "06:30": 20.75,
+    "07:00": 18.57,
+    "07:30": 17.58,
+    "08:00": 17.46,
+    "08:30": 17.04,
+    "09:00": 16.6,
+    "09:30": 16.5
+  },
+  "coverage_by_date": {
+    "2026-10-14": {
+      "active_slices": 6,
+      "mean_observed_speed": 16.4,
+      "mean_confidence": 0.835
+    },
+    "2026-10-15": {
+      "active_slices": 7,
+      "mean_observed_speed": 17.15,
+      "mean_confidence": 0.978
+    },
+    "2026-10-16": {
+      "active_slices": 7,
+      "mean_observed_speed": 17.27,
+      "mean_confidence": 0.978
+    },
+    "2026-10-19": {
+      "active_slices": 6,
+      "mean_observed_speed": 17.18,
+      "mean_confidence": 0.841
+    },
+    "2026-11-07": {
+      "active_slices": 7,
+      "mean_observed_speed": 19.4,
+      "mean_confidence": 0.954
+    },
+    "2026-11-08": {
+      "active_slices": 7,
+      "mean_observed_speed": 21.92,
+      "mean_confidence": 0.948
+    },
+    "2026-11-09": {
+      "active_slices": 1,
+      "mean_observed_speed": 20.32,
+      "mean_confidence": 0.137
+    }
+  }
+}

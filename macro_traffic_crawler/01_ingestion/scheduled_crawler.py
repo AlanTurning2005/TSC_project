@@ -1,21 +1,24 @@
 """
 scheduled_crawler.py
-Hệ thống Crawler Tự động Lên lịch & Xoay vòng Nhiều API Keys:
-1. Khung giờ quét cố định trong ngày:
-   - 06:00 - 08:00 (Sáng cao điểm)
-   - 10:00 - 12:00 (Trưa bình thường)
-   - 16:00 - 18:00 (Chiều cao điểm)
-   - 02:00 - 03:00 (Đêm vắng)
-2. Quản lý xoay vòng 5 API Keys: Tự động chuyển đổi mượt mà khi hết quota.
-3. Tự động tính năng lực (C) theo TCVN 104:2007 và BPR flow.
+Hệ thống Crawler Tự động Lên lịch & Quản lý Hạn ngạch Thông minh (Smart Quota Guard):
+1. Chế độ Cào Liên tục & Tùy biến chu kỳ (Custom Interval):
+   - Mặc định cào liên tục với chu kỳ tùy chỉnh (--interval 60 -> chu kỳ thực tế ~120s do độ trễ 66 điểm).
+2. Cơ chế Quota Guard (Ví dự phòng sáng sớm):
+   - Mặc định bảo lưu 3.000 requests (hoặc tùy biến qua --reserve 3000) cho khung 06:00 - 07:00 sáng hôm sau.
+   - Khi hết hạn ngạch ban ngày (21.800 reqs đã tiêu thụ), hệ thống tự động đi ngủ (Sleep) qua đêm để bảo toàn quota.
+   - Đúng 06:00:00 sáng hôm sau, tự động thức dậy, mở khóa 3.000 requests cào tiếp đến khi TomTom reset lúc 07:00:00.
+   - Lúc 07:00:00 sáng (00:00 UTC), TomTom reset hạn ngạch mới 100%, vòng lặp lại tiếp tục mượt mà.
+3. Cơ chế Windows Keep-Awake:
+   - Tự động ngăn Windows rơi vào trạng thái Sleep/Hibernate khi script đang chạy ngầm.
 """
 
 import sys
 import os
 import json
 import time
+import ctypes
 import argparse
-from datetime import datetime, time as dtime, timedelta
+from datetime import datetime, timezone, timedelta, time as dtime
 from pathlib import Path
 from typing import List, Tuple, Optional
 
@@ -44,72 +47,96 @@ from config import (
     REQUEST_DELAY_SECONDS
 )
 from tomtom_client import TomTomTrafficClient, QuotaExceededError
-from key_rotator import KeyRotator
+from key_rotator import KeyRotator, VN_TZ
 from run_crawler import calculate_segment_capacity, estimate_bpr_volume
 
 # ==============================================================================
-# CẤU HÌNH CÁC KHUNG GIỜ CỐ ĐỊNH (SCHEDULE WINDOWS)
+# HỖ TRỢ WINDOWS KEEP-AWAKE (CHỐNG NGỦ MÁY)
 # ==============================================================================
-SCHEDULE_WINDOWS = [
-    {"name": "Sáng cao điểm",   "start": dtime(6, 0),  "end": dtime(8, 0)},
-    {"name": "Trưa bình thường", "start": dtime(10, 0), "end": dtime(12, 0)},
-    {"name": "Chiều cao điểm",  "start": dtime(16, 0), "end": dtime(18, 0)},
-    {"name": "Đêm vắng vẻ",     "start": dtime(2, 0),  "end": dtime(3, 0)}
-]
+def set_windows_keep_awake(enable: bool = True):
+    """Bật/tắt cờ ngăn Windows rơi vào trạng thái Sleep/Hibernate khi cào dữ liệu dài hạn."""
+    if sys.platform == "win32":
+        try:
+            ES_CONTINUOUS = 0x80000000
+            ES_SYSTEM_REQUIRED = 0x00000001
+            ES_AWAYMODE_REQUIRED = 0x00000040
+            if enable:
+                ctypes.windll.kernel32.SetThreadExecutionState(
+                    ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_AWAYMODE_REQUIRED
+                )
+            else:
+                ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS)
+        except Exception:
+            pass
 
-def check_schedule_window(now: datetime) -> Tuple[bool, Optional[str], int]:
-    """
-    Kiểm tra thời điểm hiện tại có nằm trong các khung giờ cào hay không.
-    Trả về:
-    - in_window (bool): True nếu đang trong khung giờ.
-    - current_window_name (str): Tên khung giờ hiện tại (nếu có).
-    - seconds_to_next (int): Số giây còn lại cho đến khung giờ kế tiếp.
-    """
-    curr_time = now.time()
+# ==============================================================================
+# CÁC HÀM TÍNH TOÁN THỜI GIAN CHỜ THÔNG MINH
+# ==============================================================================
+def get_seconds_until_next_target(target_hour: int, target_minute: int = 0) -> Tuple[int, datetime]:
+    """Tính số giây từ thời điểm hiện tại đến mốc giờ mục tiêu kế tiếp theo giờ VN."""
+    now_vn = datetime.now(VN_TZ)
+    target_today = now_vn.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0)
+    
+    if now_vn < target_today:
+        target_time = target_today
+    else:
+        target_time = target_today + timedelta(days=1)
+        
+    seconds_to_wait = int((target_time - now_vn).total_seconds())
+    return max(1, seconds_to_wait), target_time
 
-    # 1. Kiểm tra xem có đang nằm trong khung giờ nào không
-    for win in SCHEDULE_WINDOWS:
-        if win["start"] <= curr_time < win["end"]:
-            return True, win["name"], 0
+def sleep_countdown(seconds: int, reason_msg: str):
+    """Ngủ ngắt quãng theo từng 15-30 giây để bắt tín hiệu Ctrl+C mượt mà."""
+    print(f"\n[*] {reason_msg}")
+    end_time = time.time() + seconds
+    try:
+        while time.time() < end_time:
+            remaining = int(end_time - time.time())
+            if remaining <= 0:
+                break
+            hrs = remaining // 3600
+            mins = (remaining % 3600) // 60
+            secs = remaining % 60
+            # Cập nhật dòng trạng thái trên cùng 1 dòng
+            sys.stdout.write(f"\r  [SLEEP MODE] Còn lại: {hrs:02d}h {mins:02d}m {secs:02d}s ...   ")
+            sys.stdout.flush()
+            time.sleep(min(15, remaining))
+        print("\n[*] Đã hết thời gian chờ. Thức dậy tiếp tục tiến trình!\n")
+    except KeyboardInterrupt:
+        print("\n\n[*] Người dùng hủy bỏ thời gian chờ.")
+        raise
 
-    # 2. Nếu không, tính thời gian cần ngủ đến khung giờ gần nhất tiếp theo
-    now_ts = now.timestamp()
-    candidates = []
-
-    for win in SCHEDULE_WINDOWS:
-        # Giờ bắt đầu trong ngày hôm nay
-        start_today = datetime.combine(now.date(), win["start"])
-        if start_today > now:
-            candidates.append(start_today)
-        else:
-            # Giờ bắt đầu vào ngày mai
-            start_tomorrow = datetime.combine(now.date() + timedelta(days=1), win["start"])
-            candidates.append(start_tomorrow)
-
-    next_window_time = min(candidates)
-    seconds_to_wait = int(next_window_time.timestamp() - now_ts)
-    return False, None, max(1, seconds_to_wait)
-
-def run_scheduled_crawl_round(client: TomTomTrafficClient, rotator: KeyRotator, points_file: Path, limit: int = None, output_csv: Optional[str] = None, save_raw: bool = False):
+# ==============================================================================
+# VÒNG CÀO 1 SNAPSHOT CHO TOÀN BỘ CÁC ĐIỂM ĐO
+# ==============================================================================
+def run_scheduled_crawl_round(
+    client: TomTomTrafficClient,
+    rotator: KeyRotator,
+    points_file: Path,
+    limit: Optional[int] = None,
+    output_csv: Optional[str] = None,
+    save_raw: bool = False
+) -> bool:
     """Thực hiện trọn vẹn 1 vòng cào cho toàn bộ danh sách điểm đo có failover API key."""
     if not points_file.exists():
-        print(f"[!] Khong tim thay {points_file}. Vui long chay extract_osm_points.py truoc.")
+        print(f"[!] Không tìm thấy file {points_file}. Vui lòng tạo danh sách điểm trước.")
         return False
 
     df_points = pd.read_csv(points_file)
     if limit:
         df_points = df_points.head(limit)
 
-    now = datetime.now()
-    timestamp_str = now.strftime("%Y%m%d_%H%M%S")
-    iso_time_str = now.isoformat()
+    now_vn = rotator.get_vn_now()
+    timestamp_str = now_vn.strftime("%Y%m%d_%H%M%S")
+    iso_time_str = now_vn.isoformat()
 
     print(f"\n==================================================")
-    print(f"[*] Bat dau vong cào: {iso_time_str} | Tong so diem: {len(df_points)}")
+    print(f"[*] Bắt đầu vòng cào: {now_vn.strftime('%H:%M:%S %d/%m/%Y')} | Điểm đo: {len(df_points)}")
     print(f"==================================================")
 
     raw_snapshots = []
     processed_records = []
+    t_round_start = time.time()
 
     for idx, row in df_points.iterrows():
         point_id = row["point_id"]
@@ -118,12 +145,12 @@ def run_scheduled_crawl_round(client: TomTomTrafficClient, rotator: KeyRotator, 
         lon = float(row["lon"])
         lanes = int(row.get("lanes", 1))
 
-        # Cơ chế In-flight Key Failover: Thử lấy key khả dụng
+        # Cơ chế Failover Key tức thời khi gặp lỗi hoặc chạm trần
         flow = None
         while flow is None:
             active_key = rotator.get_active_key()
             if not active_key:
-                print("[ALERT] Tat ca cac API keys da can kiet quota. Dung vong crawl.")
+                print(f"[!] Tạm dừng cào giữa vòng tại điểm #{idx+1} do chính sách Quota Guard.")
                 return False
 
             try:
@@ -131,11 +158,10 @@ def run_scheduled_crawl_round(client: TomTomTrafficClient, rotator: KeyRotator, 
                 if flow:
                     rotator.record_success(active_key)
                 else:
-                    break # Lỗi dữ liệu khác, bỏ qua điểm này
+                    break
             except QuotaExceededError:
-                # Key bị hết quota ngay lập tức -> Đánh dấu và tự động lấy key tiếp theo
-                rotator.mark_exhausted(active_key, reason="TomTom tra ve 403 Quota Exceeded")
-                print(f"[*] Chuyen ngay sang API key tiep theo cho diem {point_id}...")
+                rotator.mark_exhausted(active_key, reason="TomTom báo HTTP 403 Quota Exceeded")
+                print(f"[*] Chuyển ngay sang API key tiếp theo cho điểm {point_id}...")
 
         if not flow:
             continue
@@ -150,7 +176,6 @@ def run_scheduled_crawl_round(client: TomTomTrafficClient, rotator: KeyRotator, 
             "data": flow.get("raw_response", {})
         })
 
-        # Tính toán đặc trưng vĩ mô chuẩn TCVN
         curr_t = flow["current_travel_time"]
         free_t = flow["free_flow_travel_time"]
         frc_code = flow.get("frc", "FRC1")
@@ -160,8 +185,8 @@ def run_scheduled_crawl_round(client: TomTomTrafficClient, rotator: KeyRotator, 
 
         processed_records.append({
             "timestamp": iso_time_str,
-            "date": now.strftime("%Y-%m-%d"),
-            "time": now.strftime("%H:%M:%S"),
+            "date": now_vn.strftime("%Y-%m-%d"),
+            "time": now_vn.strftime("%H:%M:%S"),
             "point_id": point_id,
             "road_name": road_name,
             "highway_type": row.get("highway_type", "primary"),
@@ -182,119 +207,153 @@ def run_scheduled_crawl_round(client: TomTomTrafficClient, rotator: KeyRotator, 
             "arrival_rate_vps": arrival_rate_vps
         })
 
-        print(f"  [{idx+1}/{len(df_points)}] {road_name} ({point_id}): "
-              f"Lanes={lanes}, Speed={flow['current_speed']:.1f}/{flow['free_flow_speed']:.1f} km/h, "
-              f"Vol={est_volume:.0f} vph")
+        print(f"  [{idx+1:02d}/{len(df_points)}] {road_name} ({point_id}): "
+              f"Speed={flow['current_speed']:.1f}/{flow['free_flow_speed']:.1f} km/h, Conf={flow['confidence']:.2f}")
 
-    # 1. Lưu RAW JSON Snapshot (Chỉ khi bật --save-raw để tiết kiệm dung lượng ổ cứng)
-    if save_raw:
+    round_duration = time.time() - t_round_start
+    print(f"[*] Vòng cào hoàn tất trong: {round_duration:.1f} giây ({len(processed_records)}/{len(df_points)} điểm thành công)")
+
+    # 1. Lưu RAW JSON Snapshot (nếu được bật)
+    if save_raw and raw_snapshots:
         RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
         raw_file = RAW_DATA_DIR / f"raw_snapshot_{timestamp_str}.json"
         with open(raw_file, "w", encoding="utf-8") as f:
             json.dump(raw_snapshots, f, ensure_ascii=False, indent=2)
 
-    # 2. Lưu PROCESSED CSV History
-    if output_csv:
-        out_p = Path(output_csv)
-        processed_file = (PROCESSED_DATA_DIR / out_p) if len(out_p.parts) == 1 else out_p
-    else:
-        processed_file = PROCESSED_DATA_DIR / "macro_traffic_dense_1min.csv"
-    processed_file.parent.mkdir(parents=True, exist_ok=True)
-    df_new = pd.DataFrame(processed_records)
+    # 2. Ghi nối tiếp vào file PROCESSED CSV
+    if processed_records:
+        if output_csv:
+            out_p = Path(output_csv)
+            processed_file = (PROCESSED_DATA_DIR / out_p) if len(out_p.parts) == 1 else out_p
+        else:
+            processed_file = PROCESSED_DATA_DIR / "macro_traffic_history.csv"
+            
+        processed_file.parent.mkdir(parents=True, exist_ok=True)
+        df_new = pd.DataFrame(processed_records)
 
-    if processed_file.exists() and os.path.getsize(processed_file) > 0:
-        try:
-            df_existing = pd.read_csv(processed_file)
-            df_combined = pd.concat([df_existing, df_new], ignore_index=True)
-        except Exception:
+        if processed_file.exists() and os.path.getsize(processed_file) > 0:
+            try:
+                df_existing = pd.read_csv(processed_file)
+                df_combined = pd.concat([df_existing, df_new], ignore_index=True)
+            except Exception:
+                df_combined = df_new
+        else:
             df_combined = df_new
-    else:
-        df_combined = df_new
 
-    df_combined.to_csv(processed_file, index=False, encoding="utf-8-sig")
-    print(f"[OK] Da luu thanh cong {len(processed_records)} records vao: {processed_file}")
+        df_combined.to_csv(processed_file, index=False, encoding="utf-8-sig")
+        print(f"[OK] Đã lưu nối tiếp {len(processed_records)} records vào: {processed_file}")
+
     return True
 
+# ==============================================================================
+# HÀM CHÍNH (MAIN SCHEDULER & RUNNER)
+# ==============================================================================
 def main():
-    parser = argparse.ArgumentParser(description="TomTom Multi-Key Scheduled Macro Traffic Crawler")
-    parser.add_argument("--now", action="store_true", help="Bo qua kiem tra gio, chay ngay lap tuc 1 vong (dung de test)")
-    parser.add_argument("--all-day", action="store_true", help="Chay lien tuc 24/24 khong gioi han theo 4 khung gio co dinh")
-    parser.add_argument("--mock", action="store_true", help="Chay o che do Mock Test voi 5 keys ao")
-    parser.add_argument("--interval", type=int, default=CRAWL_INTERVAL_SECONDS, help="Khoang cach giua cac vong trong khung gio (giay)")
-    parser.add_argument("--limit", type=int, default=None, help="Gioi han so diem do moi vong")
-    parser.add_argument("--output", "-o", type=str, default=None, help="Duong dan file CSV ket qua (mac dinh: macro_traffic_dense_1min.csv)")
-    parser.add_argument("--save-raw", action="store_true", help="Luu file JSON snapshot tho cua tung vong (mac dinh: False de tranh tran o cung)")
-    parser.add_argument("--summary", action="store_true", help="Chi in thong ke quota cac keys roi thoat")
+    parser = argparse.ArgumentParser(description="TomTom Smart Quota Guard Continuous Traffic Crawler")
+    parser.add_argument("--now", action="store_true", help="Chạy ngay lập tức 1 vòng kiểm tra rồi thoát")
+    parser.add_argument("--all-day", action="store_true", help="Chạy liên tục cả ngày (tương thích ngược)")
+    parser.add_argument("--interval", type=int, default=60, help="Thời gian nghỉ giữa các vòng cào (giây, mặc định 60s)")
+    parser.add_argument("--reserve", type=int, default=3000, help="Số lượng request bảo lưu tuyệt đối cho khung 06:00 - 07:00 sáng mai (mặc định 3.000 reqs)")
+    parser.add_argument("--morning-start", type=int, default=6, help="Giờ mở khóa ví dự phòng vào sáng sớm hôm sau (mặc định 6 = 06:00 AM)")
+    parser.add_argument("--limit", type=int, default=None, help="Giới hạn số điểm đo mỗi vòng (dùng để test nhanh)")
+    parser.add_argument("--output", "-o", type=str, default="macro_traffic_history.csv", help="File CSV đầu ra (mặc định: macro_traffic_history.csv)")
+    parser.add_argument("--save-raw", action="store_true", help="Lưu file JSON raw snapshot của từng vòng")
+    parser.add_argument("--summary", action="store_true", help="Chỉ in thống kê quota của các keys rồi thoát")
+    parser.add_argument("--reset", action="store_true", help="Buộc reset toàn bộ trạng thái quota về 0 ngay lập tức")
+    parser.add_argument("--mock", action="store_true", help="Chạy ở chế độ Mock Test (không tốn request TomTom thật)")
 
     args = parser.parse_args()
 
-    # Khoi tao bo quan ly xoay vong keys
+    # Kích hoạt chế độ chống ngủ máy Windows
+    set_windows_keep_awake(True)
+
+    # Khởi tạo bộ quản lý xoay vòng keys với cơ chế Quota Guard
     rotator = KeyRotator(
         keys=TOMTOM_API_KEYS,
         state_file=STATE_FILE,
+        reserve_requests=args.reserve,
+        morning_start_hour=args.morning_start,
         mock_mode=args.mock or len(TOMTOM_API_KEYS) == 0
     )
 
+    if args.reset:
+        rotator.force_reset()
+        rotator.print_summary()
+        set_windows_keep_awake(False)
+        return
+
     if args.summary:
         rotator.print_summary()
+        set_windows_keep_awake(False)
         return
 
     client = TomTomTrafficClient(api_key="MOCK" if args.mock else None)
 
-    print("==================================================")
-    print("[*] KHOI DONG HE THONG CRAWLER NHIEU KEYS & LEN LICH")
-    print(f"[*] Tong so API Keys duoc nap: {len(rotator.keys)}")
-    if args.all_day:
-        print("[*] CHE DO: Cào liên tục 24/24 (Không giới hạn khung giờ)")
-    else:
-        print(f"[*] Cac khung gio quan trac trong ngay:")
-        for win in SCHEDULE_WINDOWS:
-            print(f"    + {win['name']}: {win['start'].strftime('%H:%M')} -> {win['end'].strftime('%H:%M')}")
-    print("==================================================")
+    print("=================================================================")
+    print("[*] HỆ THỐNG CRAWLER TOMTOM TỰ ĐỘNG - SMART QUOTA GUARD")
+    print(f"[*] Số lượng API Keys: {len(rotator.keys)} | Tổng dung lượng Pool: {rotator.get_total_capacity()} reqs")
+    print(f"[*] Ngưỡng bảo lưu sáng hôm sau: {args.reserve} reqs (dành riêng cho khung 06:00 - 07:00)")
+    print(f"[*] Chu kỳ nghỉ giữa các vòng: {args.interval} giây")
+    print(f"[*] Tệp dữ liệu đầu ra: {args.output}")
+    print(f"[*] Cơ chế Windows Keep-Awake: ĐÃ BẬT (Ngăn máy tính tự Sleep/Hibernate)")
+    print("=================================================================")
     rotator.print_summary()
 
     if args.now:
-        print("[*] Che do '--now': Chay kiem tra ngay 1 vong cào...")
+        print("[*] Chế độ '--now': Chạy ngay 1 vòng kiểm tra kỹ thuật...")
         run_scheduled_crawl_round(client, rotator, POINTS_FILE, limit=args.limit, output_csv=args.output, save_raw=args.save_raw)
         rotator.print_summary()
+        set_windows_keep_awake(False)
         return
 
     try:
         while True:
-            now = datetime.now()
-            if args.all_day:
-                in_window = True
-                window_name = "Toan bo 24h"
-                seconds_to_wait = 0
+            # Kiểm tra và xử lý reset hạn ngạch ngày mới lúc 07:00 AM VN (00:00 UTC)
+            rotator.check_utc_day_reset()
+
+            active_key = rotator.get_active_key()
+
+            if active_key is not None:
+                # Có key khả dụng -> Thực hiện 1 vòng cào
+                success = run_scheduled_crawl_round(
+                    client=client,
+                    rotator=rotator,
+                    points_file=POINTS_FILE,
+                    limit=args.limit,
+                    output_csv=args.output,
+                    save_raw=args.save_raw
+                )
+
+                if success:
+                    print(f"[*] Nghỉ {args.interval}s trước khi bước vào vòng cào kế tiếp...")
+                    time.sleep(args.interval)
+                else:
+                    # Đang cào mà hết key / chạm ngưỡng quota guard
+                    time.sleep(5)
             else:
-                in_window, window_name, seconds_to_wait = check_schedule_window(now)
-
-            if in_window:
-                print(f"\n[DANG TRONG KHUNG GIO] >>> {window_name} ({now.strftime('%H:%M:%S')}) <<<")
-                success = run_scheduled_crawl_round(client, rotator, POINTS_FILE, limit=args.limit, output_csv=args.output, save_raw=args.save_raw)
-                
-                if not success:
-                    # Nếu hết toàn bộ keys, ngủ đến 07:05 sáng mai để chờ reset
-                    print("[!] Dung crawler cho den khi reset quota vao 07:05 sang mai.")
-                    time.sleep(3600)
-                    continue
-
+                # Quota Guard kích hoạt hoặc toàn bộ keys đã cạn kiệt
                 rotator.print_summary()
-                print(f"[*] Hoan thanh 1 vong. Nghi {args.interval} giay truoc khi cào tiep...")
-                time.sleep(args.interval)
+                now_vn = rotator.get_vn_now()
 
-            else:
-                next_time_str = (now + timedelta(seconds=seconds_to_wait)).strftime('%H:%M:%S %d/%m')
-                print(f"[*] Hien tai ngoai khung gio cào ({now.strftime('%H:%M:%S')}).")
-                print(f"[*] He thong se 'ngu' {seconds_to_wait // 60} phut ({seconds_to_wait}s) den khung gio tiep theo: {next_time_str}...")
-                
-                # Ngu chia nho theo từng phút để có thể bắt Ctrl+C mượt mà
-                sleep_chunk = min(60, seconds_to_wait)
-                time.sleep(sleep_chunk)
+                if rotator.is_morning_reserve_window():
+                    # Đang trong khung 06:00 - 07:00 mà hết key -> Ngủ đến 07:00:05 để chờ TomTom reset
+                    secs_to_wait, target_time = get_seconds_until_next_target(7, 0)
+                    msg = f"Đã dùng hết quỹ dự phòng sáng sớm. Ngủ đến thời điểm reset {target_time.strftime('%H:%M:%S')}..."
+                else:
+                    # Ban ngày đã chạm ngưỡng bảo lưu 3.000 reqs -> Ngủ qua đêm đến đúng 06:00:00 sáng mai
+                    secs_to_wait, target_time = get_seconds_until_next_target(args.morning_start, 0)
+                    msg = (f"[QUOTA GUARD] Đã bảo toàn thành công {args.reserve} requests cho sáng mai!\n"
+                           f"    + Hệ thống tự động chuyển sang chế độ ngủ bảo toàn quota.\n"
+                           f"    + Thời điểm thức dậy: {target_time.strftime('%H:%M:%S %d/%m/%Y')} (đúng 06:00 AM)")
+
+                sleep_countdown(secs_to_wait, msg)
 
     except KeyboardInterrupt:
-        print("\n[*] Nguoi dung da dung tien trinh crawler.")
+        print("\n\n[*] Người dùng chủ động dừng tiến trình crawler.")
         rotator.print_summary()
+    finally:
+        set_windows_keep_awake(False)
+        print("[*] Đã khôi phục cài đặt nguồn điện máy tính về mặc định.")
 
 if __name__ == "__main__":
     main()

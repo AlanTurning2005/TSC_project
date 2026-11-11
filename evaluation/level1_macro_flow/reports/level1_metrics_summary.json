@@ -1,78 +1,78 @@
 {
     "evaluation_name": "Level 1 Macro Flow Evaluation",
-    "test_date": "2026-10-20",
+    "test_date": "2026-10-15",
     "num_evaluated_points": 64,
     "scientific_validity": {
         "status": "FAIL_WORSE_THAN_FREEFLOW",
         "message": "Mô phỏng kém hơn giả định đường vắng tanh. Không nắm bắt được ùn tắc.",
-        "sumo_rmse": 16.926,
+        "sumo_rmse": 13.226,
         "benchmarks": {
-            "freeflow_rmse": 14.615,
-            "historical_median_rmse": 1.846,
-            "theoretical_noise_floor": 5.182
+            "freeflow_rmse": 11.643,
+            "historical_median_rmse": 2.137,
+            "theoretical_noise_floor": 3.712
         },
         "acceptable_zone_range": [
-            5.182,
-            7.329
+            3.712,
+            5.25
         ]
     },
     "pillar1_speed_errors": {
-        "rmse": 16.926,
-        "rmse_kmh": 16.926,
-        "mae": 14.306,
-        "mae_kmh": 14.306,
-        "mean_error_bias_kmh": -10.208,
-        "bias": -10.208,
-        "smape_percent": 133.11,
-        "mre_percent": 43.1,
-        "mre": 43.1
+        "rmse": 13.226,
+        "rmse_kmh": 13.226,
+        "mae": 10.859,
+        "mae_kmh": 10.859,
+        "mean_error_bias_kmh": -4.124,
+        "bias": -4.124,
+        "smape_percent": 63.42,
+        "mre_percent": 34.03,
+        "mre": 34.03
     },
     "pillar2_rank_correlation": {
-        "spearman_rho": 0.2009,
-        "spearman_pvalue": 0.11143,
-        "kendall_tau": 0.1378,
-        "kendall_pvalue": 0.10845
+        "spearman_rho": 0.1367,
+        "spearman_pvalue": 0.28158,
+        "kendall_tau": 0.0976,
+        "kendall_pvalue": 0.25601
     },
     "pillar3_distribution_divergence": {
-        "wasserstein_w1_kmh": 8.649,
-        "wasserstein_w1": 8.649,
-        "ks_statistic": 0.7344,
-        "ks_statistic_d": 0.7344,
-        "ks_pvalue": 5.1352e-17
+        "wasserstein_w1_kmh": 3.719,
+        "wasserstein_w1": 3.719,
+        "ks_statistic": 0.2969,
+        "ks_statistic_d": 0.2969,
+        "ks_pvalue": 0.0068226
     },
     "pillar4_los_regimes": {
-        "accuracy": 0.3125,
-        "macro_f1": 0.2161,
-        "macro_precision": 0.3755,
-        "macro_recall": 0.314,
-        "cohen_kappa": 0.034,
+        "accuracy": 0.2344,
+        "macro_f1": 0.1802,
+        "macro_precision": 0.2937,
+        "macro_recall": 0.169,
+        "cohen_kappa": -0.071,
         "matrix_array": [
             [
-                16,
-                1,
-                2
-            ],
-            [
-                28,
-                4,
-                8
-            ],
-            [
-                5,
+                0,
                 0,
                 0
+            ],
+            [
+                12,
+                10,
+                25
+            ],
+            [
+                8,
+                4,
+                5
             ]
         ],
         "matrix_dict": {
-            "true_C_pred_C": 16,
-            "true_C_pred_S": 1,
-            "true_C_pred_F": 2,
-            "true_S_pred_C": 28,
-            "true_S_pred_S": 4,
-            "true_S_pred_F": 8,
-            "true_F_pred_C": 5,
-            "true_F_pred_S": 0,
-            "true_F_pred_F": 0
+            "true_C_pred_C": 0,
+            "true_C_pred_S": 0,
+            "true_C_pred_F": 0,
+            "true_S_pred_C": 12,
+            "true_S_pred_S": 10,
+            "true_S_pred_F": 25,
+            "true_F_pred_C": 8,
+            "true_F_pred_S": 4,
+            "true_F_pred_F": 5
         },
         "labels": [
             "C (Kẹt xe)",
@@ -84,14 +84,25 @@
         "cluster_col": "road_name",
         "n_clusters": 22,
         "n_bootstrap": 1000,
-        "original_metric": 15.7225,
-        "bootstrap_mean": 15.7134,
-        "bootstrap_se": 1.3377,
-        "bootstrap_bias": -0.0091,
-        "ci_lower": 13.2204,
-        "ci_upper": 18.4587,
+        "original_metric": 12.7665,
+        "bootstrap_mean": 12.769,
+        "bootstrap_se": 0.7804,
+        "bootstrap_bias": 0.0026,
+        "ci_lower": 11.3239,
+        "ci_upper": 14.2682,
         "confidence_level": 95.0,
-        "ci_formatted": "[13.220, 18.459]",
-        "academic_report": "15.723 (95% Cluster Boot CI: [13.220, 18.459], M=22 corridors)"
+        "ci_formatted": "[11.324, 14.268]",
+        "academic_report": "12.766 (95% Cluster Boot CI: [11.324, 14.268], M=22 corridors)"
+    },
+    "network_flow_dynamics": {
+        "total_completed_trips": 20827,
+        "warmup_sec": 900.0,
+        "post_warmup_completed_trips": 18293,
+        "completion_rate_pct": 91.17,
+        "mean_duration_s": 432.21,
+        "mean_time_loss_s": 290.52,
+        "mean_waiting_time_s": 194.06,
+        "mean_route_length_m": 1343.42,
+        "mean_trip_speed_kmh": 11.19
     }
 }

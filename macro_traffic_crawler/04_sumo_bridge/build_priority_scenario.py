@@ -241,8 +241,8 @@ if __name__ == "__main__":
     parser.add_argument("--routes", type=Path, default=default_route, help="Đường dẫn file route (.rou.xml)")
     parser.add_argument("--vtypes", type=Path, default=default_vtypes, help="Đường dẫn file vtypes (.add.xml)")
     parser.add_argument("--end-time", type=int, default=22603, help="Thời gian kết thúc mô phỏng (giây)")
-    parser.add_argument("--step-length", type=float, default=1.0, help="Độ dài bước mô phỏng (giây)")
-    parser.add_argument("--lateral-resolution", type=float, default=0.8, help="Độ phân giải Sublane (mét)")
+    parser.add_argument("--step-length", type=float, default=0.2, help="Độ dài bước mô phỏng (giây, chuẩn hóa 0.2s theo tau=0.6s)")
+    parser.add_argument("--lateral-resolution", type=float, default=0.25, help="Độ phân giải Sublane (mét, chuẩn hóa 0.25m)")
 
     args = parser.parse_args()
     build_priority_scenario(

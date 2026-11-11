@@ -1,0 +1,76 @@
+{
+  "evaluation_name": "5_fold_lodo_cross_validation",
+  "provenance": {
+    "is_real_sumo_simulation": false,
+    "is_synthetic_dry_run": true,
+    "provenance_type": "surrogate_dry_run_synthetic",
+    "warning": "DO NOT USE FOR SCIENTIFIC PAPERS"
+  },
+  "created_at": "2026-11-09T18:37:45.538599",
+  "calibrated_lambda_vector": [
+    2.0,
+    2.6,
+    3.2,
+    3.4,
+    3.0,
+    2.7,
+    2.5
+  ],
+  "test_dates": [
+    "2026-10-15"
+  ],
+  "fold_results": {
+    "2026-10-15": {
+      "all_criteria_met": true,
+      "criterion_1_speed_bias": {
+        "passed": true,
+        "threshold_kmh": 2.0,
+        "max_abs_bias_kmh": 1.016,
+        "biases_by_slice": {
+          "06:30": 1.016,
+          "07:00": 0.613,
+          "07:30": 0.53,
+          "08:00": 0.794,
+          "08:30": 0.298,
+          "09:00": 0.892,
+          "09:30": 0.302
+        }
+      },
+      "criterion_2_corridor_spearman": {
+        "passed": true,
+        "threshold": 0.5,
+        "rho_corridor": 0.988,
+        "p_value": 0.0
+      },
+      "criterion_3_skill_score": {
+        "passed": true,
+        "threshold": 0.0,
+        "skill_score_wrt_v0": 0.9194,
+        "rmse_calibrated_kmh": 1.069,
+        "mae_calibrated_kmh": 0.806,
+        "rmse_free_flow_kmh": 13.267
+      },
+      "criterion_4_wasserstein_w1": {
+        "passed": true,
+        "threshold_reduction_pct": 25.0,
+        "w1_calibrated_kmh": 0.642,
+        "w1_initial_kmh": 12.863,
+        "w1_reduction_pct": 95.01
+      },
+      "criterion_5_drain_clearance": {
+        "passed": true,
+        "tcr_percent": 94.12,
+        "threshold_tcr_pct": 90.0,
+        "teleport_rate_percent": 0.0,
+        "threshold_teleport_pct": 0.1
+      }
+    }
+  },
+  "overall_summary": {
+    "all_folds_passed": true,
+    "mean_rmse_kmh": 1.069,
+    "mean_corridor_spearman_rho": 0.988,
+    "mean_w1_reduction_pct": 95.01,
+    "drain_tcr_pct": 94.12
+  }
+}
